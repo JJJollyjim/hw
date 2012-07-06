@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
-	<script src="http://192.168.2.13:8080/target/target-script-min.js#phone"></script>
+	<script src="http://192.168.2.13:8080/target/target-script-min.js#phpg1"></script>
 
 	<script>
 
@@ -18,71 +18,61 @@
 	
 <body> 
 
-<!-- Start of first page: #one -->
-<div data-role="page" id="one">
+<!-- Start of first page: #pg1 -->
+<div data-role="page" id="pg1">
 
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="foo1">
-		<h1>Multi-page</h1>
+	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<h1>Today</h1>
 	</div><!-- /header -->
 
 	<div data-role="content" >	
-		<h2>One</h2>
+		<h2>pg1</h2>
 		
-		<p>I have an id of "one" on my page container. I'm first in the source order so I'm shown when the page loads.</p>	
+		<p>I have an id of "pg1" on my page container. I'm first in the source order so I'm shown when the page loads.</p>	
 		
-		<p>This is a multi-page boilerplate template that you can copy to build your first jQuery Mobile page. This template contains multiple "page" containers inside, unlike a <a href="page-template.html"> single page template</a> that has just one page within it.</p>	
+		<p>This is a multi-page boilerplate template that you can copy to build your first jQuery Mobile page. This template contains multiple "page" containers inside, unlike a <a href="page-template.html"> single page template</a> that has just pg1 page within it.</p>	
 		<p>Just view the source and copy the code to get started. All the CSS and JS is linked to the jQuery CDN versions so this is super easy to set up. Remember to include a meta viewport tag in the head to set the zoom level.</p>
-		<p>You link to internal pages by referring to the ID of the page you want to show. For example, to <a href="#two" >link</a> to the page with an ID of "two", my link would have a <code>href="#two"</code> in the code.</p>	
+
+		<div class="ui-body ui-body-c">
+			<h1>H1 Heading</h1>
+			<p>This is a paragraph that contains <strong>strong</strong>, <em>emphasized</em> and <a href="index.html" class="ui-link">linked</a> text. Here is more text so you can see how HTML markup works in content. Here is more text so you can see how HTML markup works in content.</p>
+			<div data-role="collapsible" data-collapsed="true" data-theme="c" class="ui-collapsible ui-collapsible-collapsed"><h3 class="ui-collapsible-heading ui-collapsible-heading-collapsed"><a href="#" class="ui-collapsible-heading-toggle ui-btn ui-fullsize ui-btn-icon-left ui-corner-top ui-corner-bottom ui-btn-up-c" data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-icon="plus" data-iconpos="left" data-theme="c" data-mini="false"><span class="ui-btn-inner ui-corner-top ui-corner-bottom"><span class="ui-btn-text">I'm a themed collapsible<span class="ui-collapsible-heading-status"> click to expand contents</span></span><span class="ui-icon ui-icon-plus ui-icon-shadow">&nbsp;</span></span></a></h3><div class="ui-collapsible-content ui-collapsible-content-collapsed" aria-hidden="true">
+				
+				<p>I have <code> data-theme</code> attribute set manually on my container to set the color to match the content block I'm in. </p>
+			</div></div><!-- /collapsible -->
+			<div data-role="collapsible" data-theme="c" data-content-theme="c" class="ui-collapsible ui-collapsible-collapsed"><h3 class="ui-collapsible-heading ui-collapsible-heading-collapsed"><a href="#" class="ui-collapsible-heading-toggle ui-btn ui-fullsize ui-btn-icon-left ui-corner-top ui-corner-bottom ui-btn-up-c" data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-icon="plus" data-iconpos="left" data-theme="c" data-mini="false"><span class="ui-btn-inner ui-corner-top ui-corner-bottom"><span class="ui-btn-text">I'm a themed collapsible with a themed content<span class="ui-collapsible-heading-status"> click to expand contents</span></span><span class="ui-icon ui-icon-plus ui-icon-shadow">&nbsp;</span></span></a></h3><div class="ui-collapsible-content ui-body-c ui-collapsible-content-collapsed" aria-hidden="true">
+				
+				<p>I have <code> data-content-theme</code> attribute set manually on my container to set the color to match the content block I'm in. </p>
+			</div></div>
+		</div>
 
 		<h3>Show internal pages:</h3>
-		<p><a href="#two" data-role="button">Show page "two"</a></p>	
-		<p><a href="#popup"data-role="button" data-transition="slide">Show page "popup" (as a slideything)</a></p>
+		<p><a href="#pg2"data-role="button" data-transition="slide">Slide</a></p>
 	</div><!-- /content -->
 	
-	<div data-role="footer" data-theme="d">
+	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
-</div><!-- /page one -->
+</div><!-- /page pg1 -->
 
 
-<!-- Start of second page: #two -->
-<div data-role="page" id="two" data-theme="a">
+<!-- Start of third page: #pg2 -->
+<div data-role="page" id="pg2">
 
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="foo1">
-		<h1>Two</h1>
-	</div><!-- /header -->
-
-	<div data-role="content" data-theme="a">	
-		<h2>Two</h2>
-		<p>I have an id of "two" on my page container. I'm the second page container in this multi-page template.</p>	
-		<p>Notice that the theme is different for this page because we've added a few <code>data-theme</code> swatch assigments here to show off how flexible it is. You can add any content or widget to these pages, but we're keeping these simple.</p>	
-		<p><a href="#one" data-direction="reverse" data-role="button" data-theme="b">Back to page "one"</a></p>	
-		
-	</div><!-- /content -->
-	
-	<div data-role="footer">
-		<h4>Page Footer</h4>
-	</div><!-- /footer -->
-</div><!-- /page two -->
-
-
-<!-- Start of third page: #popup -->
-<div data-role="page" id="popup">
-
-	<div data-role="header" data-theme="e" data-position="fixed" data-tap-toggle="false" data-id="foo1">
-		<h1>Dialog</h1>
+	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<h1>Tomorrow</h1>
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="d">	
-		<h2>Popup</h2>
-		<p>I have an id of "popup" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
-		<p><a href="#one" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "one"</a></p>	
+		<h2>pg2</h2>
+		<p>I have an id of "pg2" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
+		<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
 	</div><!-- /content -->
 	
-	<div data-role="footer">
+	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
-</div><!-- /page popup -->
+</div><!-- /page pg2 -->
 
 </body>
 </html>
