@@ -11,7 +11,14 @@
 	<script src="http://192.168.2.13:8080/target/target-script-min.js#phpg1"></script>
 
 	<script>
-
+		$(document).bind('pageinit', function() {
+			$('body').bind('swiperight', function() {
+				$.mobile.changePage("#pg1", {transition: "slide", reverse: true});
+			});
+			$('body').bind('swipeleft', function() {
+				$.mobile.changePage("#pg2", {transition: "slide"});
+			});
+		});
 	</script>
 </head> 
 
@@ -19,40 +26,42 @@
 <body> 
 
 <!-- Start of first page: #pg1 -->
-<div data-role="page" id="pg1">
-
+<div data-role="page" id="pg1" data-theme="d">
 	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
 		<h1>Today</h1>
 	</div><!-- /header -->
 
-	<div data-role="content" data-theme="d">	
-		<h2>pg1</h2>
-		
-		<p>I have an id of "pg1" on my page container. I'm first in the source order so I'm shown when the page loads.</p>	
-		
-		<p>This is a multi-page boilerplate template that you can copy to build your first jQuery Mobile page. This template contains multiple "page" containers inside, unlike a <a href="page-template.html"> single page template</a> that has just pg1 page within it.</p>	
-		<p>Just view the source and copy the code to get started. All the CSS and JS is linked to the jQuery CDN versions so this is super easy to set up. Remember to include a meta viewport tag in the head to set the zoom level.</p>
-
+	<div data-role="content" data-theme="d">
 		<div class="ui-body ui-body-c">
 			<h1>H1 Heading</h1>
 			<p>This is a paragraph that contains <strong>strong</strong>, <em>emphasized</em> and <a href="index.html" class="ui-link">linked</a> text. Here is more text so you can see how HTML markup works in content. Here is more text so you can see how HTML markup works in content.</p>
-			<div data-role="collapsible" data-collapsed="true" data-theme="c" class="ui-collapsible ui-collapsible-collapsed"><h3 class="ui-collapsible-heading ui-collapsible-heading-collapsed"><a href="#" class="ui-collapsible-heading-toggle ui-btn ui-fullsize ui-btn-icon-left ui-corner-top ui-corner-bottom ui-btn-up-c" data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-icon="plus" data-iconpos="left" data-theme="c" data-mini="false"><span class="ui-btn-inner ui-corner-top ui-corner-bottom"><span class="ui-btn-text">I'm a themed collapsible<span class="ui-collapsible-heading-status"> click to expand contents</span></span><span class="ui-icon ui-icon-plus ui-icon-shadow">&nbsp;</span></span></a></h3><div class="ui-collapsible-content ui-collapsible-content-collapsed" aria-hidden="true">
-				
-				<p>I have <code> data-theme</code> attribute set manually on my container to set the color to match the content block I'm in. </p>
-			</div></div><!-- /collapsible -->
-			<div data-role="collapsible" data-theme="c" data-content-theme="c" class="ui-collapsible ui-collapsible-collapsed"><h3 class="ui-collapsible-heading ui-collapsible-heading-collapsed"><a href="#" class="ui-collapsible-heading-toggle ui-btn ui-fullsize ui-btn-icon-left ui-corner-top ui-corner-bottom ui-btn-up-c" data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-icon="plus" data-iconpos="left" data-theme="c" data-mini="false"><span class="ui-btn-inner ui-corner-top ui-corner-bottom"><span class="ui-btn-text">I'm a themed collapsible with a themed content<span class="ui-collapsible-heading-status"> click to expand contents</span></span><span class="ui-icon ui-icon-plus ui-icon-shadow">&nbsp;</span></span></a></h3><div class="ui-collapsible-content ui-body-c ui-collapsible-content-collapsed" aria-hidden="true">
-				
-				<p>I have <code> data-content-theme</code> attribute set manually on my container to set the color to match the content block I'm in. </p>
-			</div></div>
 		</div>
 
 		<h3>Show internal pages:</h3>
 		<p><a href="#pg2"data-role="button" data-transition="slide">Slide</a></p>
 	</div><!-- /content -->
 	
-	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
+	<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
 		<h4>Page Footer</h4>
-	</div><!-- /footer -->
+	</div> --><!-- /footer -->
+
+	<style>	
+		.nav-glyphish-example .ui-btn .ui-btn-inner { padding-top: 40px !important; }
+		.nav-glyphish-example .ui-btn .ui-icon { width: 30px!important; height: 30px!important; margin-left: -15px !important; box-shadow: none!important; -moz-box-shadow: none!important; -webkit-box-shadow: none!important; -webkit-border-radius: 0 !important; border-radius: 0 !important; }
+		#email .ui-icon { background:  url(glyphish-icons/83-calendar.png) 50% 50% no-repeat; background-size: 23px 25px;  }
+		#coffee .ui-icon { background:  url(glyphish-icons/179-notepad.png) 50% 50% no-repeat;  background-size: 22px 28px; }
+		#skull .ui-icon { background:  url(glyphish-icons/95-equalizer.png) 50% 50% no-repeat;  background-size: 26px 24px; }
+	</style>
+	
+	<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
+		<ul>
+			<li><a href="#" id="email" data-icon="custom">Timetable/Calendar</a></li>
+			<li><a href="#" id="coffee" data-icon="custom">Homework</a></li>
+			<li><a href="#" id="skull" data-icon="custom">Settings</a></li>
+		</ul>
+		</div>
+	</div>
 </div><!-- /page pg1 -->
 
 
