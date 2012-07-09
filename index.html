@@ -8,10 +8,16 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
-	<script src="http://192.168.2.13:8080/target/target-script-min.js#phpg1"></script>
+	<script src="modernizr.js"></script>
 
 	<script>
 		$(document).bind('pageinit', function() {
+			if(!Modernizr.touch) {
+				$(".np-page").show();
+			} else {
+				$(".np-page").hide();
+			}
+
 			$('body').bind('swiperight', function() {
 				$.mobile.changePage("#pg1", {transition: "slide", reverse: true});
 			});
@@ -20,6 +26,36 @@
 			});
 		});
 	</script>
+
+	<style type="text/css">
+		.no-blue .ui-btn-active {
+			border:1px solid #111;
+			background:#333;
+			font-weight:bold;
+			color:#fff;
+			text-shadow:0 1px 1px #111;
+			background-image:-webkit-gradient(linear,left top,left bottom,from(#444),to(#2d2d2d));
+			background-image:-webkit-linear-gradient(#444,#2d2d2d);
+			background-image:-moz-linear-gradient(#444,#2d2d2d);
+			background-image:-ms-linear-gradient(#444,#2d2d2d);
+			background-image:-o-linear-gradient(#444,#2d2d2d);
+			background-image:linear-gradient(#444,#2d2d2d);
+		}
+
+	.no-blue .ui-btn-hover-a{
+		border:1px solid #000;
+		background:#444;
+		font-weight:bold;
+		color:#fff;
+		text-shadow:0 1px 1px #111;
+		background-image:-webkit-gradient(linear,left top,left bottom,from(#555),to(#383838));
+		background-image:-webkit-linear-gradient(#555,#383838);
+		background-image:-moz-linear-gradient(#555,#383838);
+		background-image:-ms-linear-gradient(#555,#383838);
+		background-image:-o-linear-gradient(#555,#383838);
+		background-image:linear-gradient(#555,#383838);
+	}
+	</style>
 </head> 
 
 	
@@ -29,6 +65,13 @@
 <div data-role="page" id="pg1" data-theme="d">
 	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
 		<h1>Today</h1>
+		<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
+		<div data-role="navbar" class="np-page no-blue">
+			<ul>
+				<li><a href="#">Previous Page</a></li>
+				<li><a href="#">Next Page</a></li>
+			</ul>
+		</div>
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="d">
@@ -56,9 +99,9 @@
 	<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
 		<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 		<ul>
-			<li><a href="#" id="email" data-icon="custom">Timetable/Calendar</a></li>
-			<li><a href="#" id="coffee" data-icon="custom">Homework</a></li>
-			<li><a href="#" id="skull" data-icon="custom">Settings</a></li>
+			<li><a href="#" id="email" data-icon="custom" class="ui-btn-active ui-state-persist">Timetable</a></li>
+			<li><a href="#hw" id="coffee" data-icon="custom">Homework</a></li>
+			<li><a href="#settings" id="skull" data-icon="custom">Settings</a></li>
 		</ul>
 		</div>
 	</div>
@@ -78,10 +121,76 @@
 		<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
 	</div><!-- /content -->
 	
-	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
-		<h4>Page Footer</h4>
-	</div><!-- /footer -->
+	<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
+		<ul>
+			<li><a href="#" id="email" data-icon="custom" class="ui-btn-active ui-state-persist">Timetable</a></li>
+			<li><a href="#hw" id="coffee" data-icon="custom">Homework</a></li>
+			<li><a href="#settings" id="skull" data-icon="custom">Settings</a></li>
+		</ul>
+		</div>
+	</div>
 </div><!-- /page pg2 -->
+
+
+<div data-role="page" id="hw">
+
+	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<h1>Homework</h1>
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#"  class="ui-btn-active ui-state-persist">Sort by Date</a></li>
+				<li><a href="#">Sort by Class</a></li>
+			</ul>
+		</div>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="d">	
+		<h2>Homework</h2>
+		<p>I have an id of "hw" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
+		<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
+	</div><!-- /content -->
+	
+	<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
+		<ul>
+			<li><a href="#pg1" id="email" data-icon="custom">Timetable</a></li>
+			<li><a href="#" id="coffee" data-icon="custom" class="ui-btn-active ui-state-persist">Homework</a></li>
+			<li><a href="#settings" id="skull" data-icon="custom">Settings</a></li>
+		</ul>
+		</div>
+	</div>
+</div><!-- /page hw -->
+
+
+<div data-role="page" id="settings">
+
+	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<h1>Homework</h1>
+		<div data-role="navbar">
+		<ul>
+			<li><a href="#"  class="ui-btn-active ui-state-persist">Sort by Date</a></li>
+			<li><a href="#">Sort by Class</a></li>
+		</ul>
+	</div>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="d">	
+		<h2>Settings</h2>
+		<p>I have an id of "settings" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
+		<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
+	</div><!-- /content -->
+	
+	<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
+		<ul>
+			<li><a href="#pg1" id="email" data-icon="custom">Timetable</a></li>
+			<li><a href="#hw" id="coffee" data-icon="custom">Homework</a></li>
+			<li><a href="#" id="skull" data-icon="custom" class="ui-btn-active ui-state-persist">Settings</a></li>
+		</ul>
+		</div>
+	</div>
+</div><!-- /page settings -->
 
 </body>
 </html>
