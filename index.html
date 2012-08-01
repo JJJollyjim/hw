@@ -1,200 +1,347 @@
 <!DOCTYPE html> 
 <html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1"> 
+		<title>Multi-page template</title> 
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+		<script src="modernizr.js"></script>
 
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<title>Multi-page template</title> 
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
-	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
-	<script src="modernizr.js"></script>
+		<script>
+			var firstInit = true;
+			var onPage = 1;
+			var day = 0;
 
-	<script>
-		$(document).bind('pageinit', function() {
-			if(!Modernizr.touch) {
-				$(".np-page").show();
-			} else {
-				$(".np-page").hide();
+			var days = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"};
+			var months = {0: "Jan", 1: "Feb", 2: "Mar", 3: "Apr", 4: "May", 5: "Jun", 6: "Jul", 7: "Aug", 8: "Sep", 9: "Oct", 10: "Nov", 11: "Dec"};
+
+			function genDate(d) {
+				n = new Date;
+				if (d.getMonth() == n.getMonth()) {
+					return days[d.getDay()] + " " + d.getDate();
+				} else {
+					return days[d.getDay()] + " " + d.getDate() + " " + months[d.getMonth()];
+				}
 			}
 
-			$('body').bind('swiperight', function() {
-				$.mobile.changePage("#pg1", {transition: "slide", reverse: true});
+			$(document).bind('pageinit', function() {
+				if(!Modernizr.touch) {
+					$(".np-page").show();
+				} else {
+					$(".np-page").hide();
+				}
+
+				if(firstInit) {
+					function prvDay() {
+						day--;
+
+						if(onPage == 1) {
+							$.mobile.changePage("#pg2", {transition: "slide", reverse: true});
+
+							onPage = 2;
+						} else {
+							$.mobile.changePage("#pg1", {transition: "slide", reverse: true});
+
+							onPage = 1;
+						}
+							
+						if(day == 0) {
+							$(".dayTitle").text("Today");
+						} else if(day == -1) {
+							$(".dayTitle").text("Yesterday");
+						} else if(day == 1) {
+							$(".dayTitle").text("Tomorrow");
+						} else {
+							d = new Date;
+							d.setTime(d.getTime()+86400000*day);
+							$(".dayTitle").text(genDate(d));
+						}
+					}
+
+					function nxtDay() {
+						day++;
+
+						if(onPage == 1) {
+							$.mobile.changePage("#pg2", {transition: "slide"});
+
+							onPage = 2;
+						} else {
+							$.mobile.changePage("#pg1", {transition: "slide"});
+
+							onPage = 1;
+						}
+							
+						if(day == 0) {
+							$(".dayTitle").text("Today");
+						} else if(day == -1) {
+							$(".dayTitle").text("Yesterday");
+						} else if(day == 1) {
+							$(".dayTitle").text("Tomorrow");
+						} else {
+							d = new Date;
+							d.setTime(d.getTime()+86400000*day);
+							$(".dayTitle").text(genDate(d));
+						}	
+					}
+
+					$('body').bind('swiperight', function() { prvDay(); });
+					$('body').bind('swipeleft' , function() { nxtDay(); });
+
+					$(".prvDay").click(function(){ prvDay(); });
+					$(".nxtDay").click(function(){ nxtDay(); });
+
+					console.log("pageinit");
+
+					firstInit = false;
+				}
 			});
-			$('body').bind('swipeleft', function() {
-				$.mobile.changePage("#pg2", {transition: "slide"});
-			});
-		});
-	</script>
 
-	<style type="text/css">
-		.no-blue .ui-btn-active {
-			border:1px solid #111;
-			background:#333;
-			font-weight:bold;
-			color:#fff;
-			text-shadow:0 1px 1px #111;
-			background-image:-webkit-gradient(linear,left top,left bottom,from(#444),to(#2d2d2d));
-			background-image:-webkit-linear-gradient(#444,#2d2d2d);
-			background-image:-moz-linear-gradient(#444,#2d2d2d);
-			background-image:-ms-linear-gradient(#444,#2d2d2d);
-			background-image:-o-linear-gradient(#444,#2d2d2d);
-			background-image:linear-gradient(#444,#2d2d2d);
-		}
+			var  green = [0, 100, 0],
+			    orange = [255, 165, 0],
+			       red = [139, 0, 0];
 
-		.no-blue .ui-btn-hover-a{
-			border:1px solid #000;
-			background:#444;
-			font-weight:bold;
-			color:#fff;
-			text-shadow:0 1px 1px #111;
-			background-image:-webkit-gradient(linear,left top,left bottom,from(#555),to(#383838));
-			background-image:-webkit-linear-gradient(#555,#383838);
-			background-image:-moz-linear-gradient(#555,#383838);
-			background-image:-ms-linear-gradient(#555,#383838);
-			background-image:-o-linear-gradient(#555,#383838);
-			background-image:linear-gradient(#555,#383838);
-		}
+			function color(val) {
+			  if (val < 0.5) {
+			    return colorToString(interpolate(val * 2, green, orange));
+			  } else {
+			    return colorToString(interpolate((val-0.5) * 2, orange, red));
+			  }
+			}
 
-		.ui-page {
-			-webkit-backface-visibility: hidden;
-		}
-	</style>
-</head> 
+			// val should be in the range [0.0, 1.0]
+			// rgb1 and rgb2 should be an array of 3 values each in the range [0, 255]
+			function interpolate(val, rgb1, rgb2) {
+			  var rgb = [0,0,0];
+			  var i;
+			  for (i = 0; i < 3; i++) {
+			    rgb[i] = rgb1[i] * (1.0 - val) + rgb2[i] * val;
+			  }
+			  return rgb;
+			}
 
-	
-<body> 
+			// quick helper function to convert the array into something we can use for css
+			function colorToString(rgb) {
+			  return "rgb(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ")";
+			}
 
-<!-- Start of first page: #pg1 -->
-<div data-role="page" id="pg1" data-theme="d">
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
-		<h1>Today</h1>
-		<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
-		<div data-role="navbar" class="np-page no-blue">
+			//$(".ui-body").toggleClass("ui-body-c");$(".ui-body").toggleClass("ui-body-b");$(".ui-body").toggleClass("nowSubject");
+		</script>
+
+		<style type="text/css">
+			* {
+			  -moz-user-select: -moz-none;
+			  -khtml-user-select: none;
+			  -webkit-user-select: none;
+			  -ms-user-select: none;
+			  user-select: none;
+			}
+
+			.no-blue .ui-btn-active {
+				border:1px solid #111;
+				background:#333;
+				font-weight:bold;
+				color:#fff;
+				text-shadow:0 1px 1px #111;
+				background-image:-webkit-gradient(linear,left top,left bottom,from(#444),to(#2d2d2d));
+				background-image:-webkit-linear-gradient(#444,#2d2d2d);
+				background-image:-moz-linear-gradient(#444,#2d2d2d);
+				background-image:-ms-linear-gradient(#444,#2d2d2d);
+				background-image:-o-linear-gradient(#444,#2d2d2d);
+				background-image:linear-gradient(#444,#2d2d2d);
+			}
+
+			.no-blue .ui-btn-hover-a{
+				border:1px solid #000;
+				background:#444;
+				font-weight:bold;
+				color:#fff;
+				text-shadow:0 1px 1px #111;
+				background-image:-webkit-gradient(linear,left top,left bottom,from(#555),to(#383838));
+				background-image:-webkit-linear-gradient(#555,#383838);
+				background-image:-moz-linear-gradient(#555,#383838);
+				background-image:-ms-linear-gradient(#555,#383838);
+				background-image:-o-linear-gradient(#555,#383838);
+				background-image:linear-gradient(#555,#383838);
+			}
+
+			.ui-page {
+				-webkit-backface-visibility: hidden;
+				padding-top: 80px;
+			}
+
+			.nav-glyphish-example .ui-btn .ui-btn-inner { padding-top: 40px !important; }
+			.nav-glyphish-example .ui-btn .ui-icon { width: 30px!important; height: 30px!important; margin-left: -15px !important; box-shadow: none!important; -moz-box-shadow: none!important; -webkit-box-shadow: none!important; -webkit-border-radius: 0 !important; border-radius: 0 !important; }
+			#email .ui-icon { background:  url(glyphish-icons/83-calendar.png) 50% 50% no-repeat; background-size: 23px 25px;  }
+			#coffee .ui-icon { background:  url(glyphish-icons/179-notepad.png) 50% 50% no-repeat;  background-size: 22px 28px; }
+			#skull .ui-icon { background:  url(glyphish-icons/95-equalizer.png) 50% 50% no-repeat;  background-size: 26px 24px; }
+
+			.subjectTitle {
+				margin-top: 5px;
+				margin-bottom: 5px;
+				color: #111;
+			}
+
+			.subjectTime {
+				margin-top: 0px;
+				margin-bottom: 5px;
+				font-size: 16px;
+				font-style: italic;
+				color: #444;
+			}
+
+			.nowSubject .subjectTitle {
+				font-size: 32px;
+			}
+
+			.nowSubject .subjectTime {
+				display: none;
+			}
+
+			.currentSubject {
+				display: none;
+			}
+
+			.nowSubject .currentSubject {
+				display: block;
+				margin-top: 0px;
+				margin-bottom: 5px;	
+			}
+
+		</style>
+	</head>
+	<body> 
+
+	<!-- Start of first page: #pg1 -->
+	<div data-role="page" id="pg1" data-theme="d">
+		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<h1 class="dayTitle">Today</h1>
+			<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
+			<div data-role="navbar" class="np-page no-blue">
+				<ul>
+					<li><a href="#" class="prvDay">Previous Day</a></li>
+					<li><a href="#" class="nxtDay">Next Day</a></li>
+				</ul>
+			</div>
+		</div><!-- /header -->
+
+		<div data-role="content" data-theme="d">
+			<div class="ui-body ui-body-c">
+				<h2 class="subjectTitle">Maths</h2>
+				<h3 class="subjectTime">Period 1</h3>
+				<h3 class="currentSubject">Current Subject</h3>
+			</div>
+
+		</div><!-- /content -->
+		
+		<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
+			<h4>Page Footer</h4>
+		</div> --><!-- /footer -->
+		
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
-				<li><a href="#">Previous Page</a></li>
-				<li><a href="#">Next Page</a></li>
+				<li><a href="#" id="email" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist">Timetable</a></li>
+				<li><a href="#hw" id="coffee" data-icon="custom" data-transition="none">Homework</a></li>
+				<li><a href="#settings" id="skull" data-icon="custom" data-transition="none">Settings</a></li>
 			</ul>
+			</div>
 		</div>
-	</div><!-- /header -->
-
-	<div data-role="content" data-theme="d">
-		<div class="ui-body ui-body-c">
-			<h1>H1 Heading</h1>
-			<p>This is a paragraph that contains <strong>strong</strong>, <em>emphasized</em> and <a href="index.html" class="ui-link">linked</a> text. Here is more text so you can see how HTML markup works in content. Here is more text so you can see how HTML markup works in content.</p>
-		</div>
-
-		<h3>Show internal pages:</h3>
-		<p><a href="#pg2"data-role="button" data-transition="slide">Slide</a></p>
-	</div><!-- /content -->
-	
-	<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
-		<h4>Page Footer</h4>
-	</div> --><!-- /footer -->
-
-	<style>	
-		.nav-glyphish-example .ui-btn .ui-btn-inner { padding-top: 40px !important; }
-		.nav-glyphish-example .ui-btn .ui-icon { width: 30px!important; height: 30px!important; margin-left: -15px !important; box-shadow: none!important; -moz-box-shadow: none!important; -webkit-box-shadow: none!important; -webkit-border-radius: 0 !important; border-radius: 0 !important; }
-		#email .ui-icon { background:  url(glyphish-icons/83-calendar.png) 50% 50% no-repeat; background-size: 23px 25px;  }
-		#coffee .ui-icon { background:  url(glyphish-icons/179-notepad.png) 50% 50% no-repeat;  background-size: 22px 28px; }
-		#skull .ui-icon { background:  url(glyphish-icons/95-equalizer.png) 50% 50% no-repeat;  background-size: 26px 24px; }
-	</style>
-	
-	<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
-		<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
-		<ul>
-			<li><a href="#" id="email" data-icon="custom" class="ui-btn-active ui-state-persist">Timetable</a></li>
-			<li><a href="#hw" id="coffee" data-icon="custom">Homework</a></li>
-			<li><a href="#settings" id="skull" data-icon="custom">Settings</a></li>
-		</ul>
-		</div>
-	</div>
-</div><!-- /page pg1 -->
+	</div><!-- /page pg1 -->
 
 
-<!-- Start of third page: #pg2 -->
-<div data-role="page" id="pg2">
+	<!-- Start of third page: #pg2 -->
+	<div data-role="page" id="pg2" data-theme="d">
+		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<h1 class="dayTitle">Today</h1>
+			<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
+			<div data-role="navbar" class="np-page no-blue">
+				<ul>
+					<li><a href="#" class="prvDay">Previous Day</a></li>
+					<li><a href="#" class="nxtDay">Next Day</a></li>
+				</ul>
+			</div>
+		</div><!-- /header -->
 
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
-		<h1>Tomorrow</h1>
-	</div><!-- /header -->
+		<div data-role="content" data-theme="d">
+			<div class="ui-body ui-body-c">
+				<h1>H1 Heading (PG2)</h1>
+				<p>This is a paragraph that contains <strong>strong</strong>, <em>emphasized</em> and <a href="index.html" class="ui-link">linked</a> text. Here is more text so you can see how HTML markup works in content. Here is more text so you can see how HTML markup works in content.</p>
+			</div>
 
-	<div data-role="content" data-theme="d">	
-		<h2>pg2</h2>
-		<p>I have an id of "pg2" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
-		<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
-	</div><!-- /content -->
-	
-	<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
-		<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
-		<ul>
-			<li><a href="#" id="email" data-icon="custom" class="ui-btn-active ui-state-persist">Timetable</a></li>
-			<li><a href="#hw" id="coffee" data-icon="custom">Homework</a></li>
-			<li><a href="#settings" id="skull" data-icon="custom">Settings</a></li>
-		</ul>
-		</div>
-	</div>
-</div><!-- /page pg2 -->
-
-
-<div data-role="page" id="hw">
-
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
-		<h1>Homework</h1>
-		<div data-role="navbar">
+			<h3>Show internal pages:</h3>
+			<p><a href="#pg2"data-role="button" data-transition="slide">Slide</a></p>
+		</div><!-- /content -->
+		
+		<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
+			<h4>Page Footer</h4>
+		</div> --><!-- /footer -->
+		
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
-				<li><a href="#"  class="ui-btn-active ui-state-persist">Sort by Date</a></li>
-				<li><a href="#">Sort by Class</a></li>
+				<li><a href="#" id="email" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist">Timetable</a></li>
+				<li><a href="#hw" id="coffee" data-icon="custom" data-transition="none">Homework</a></li>
+				<li><a href="#settings" id="skull" data-icon="custom" data-transition="none">Settings</a></li>
 			</ul>
+			</div>
 		</div>
-	</div><!-- /header -->
+	</div><!-- /page pg2 -->
 
-	<div data-role="content" data-theme="d">	
-		<h2>Homework</h2>
-		<p>I have an id of "hw" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
-		<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
-	</div><!-- /content -->
-	
-	<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
-		<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
-		<ul>
-			<li><a href="#pg1" id="email" data-icon="custom">Timetable</a></li>
-			<li><a href="#" id="coffee" data-icon="custom" class="ui-btn-active ui-state-persist">Homework</a></li>
-			<li><a href="#settings" id="skull" data-icon="custom">Settings</a></li>
-		</ul>
+
+	<div data-role="page" id="hw" data-theme="d">
+
+		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<h1>Homework</h1>
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#"  class="ui-btn-active ui-state-persist">Sort by Date</a></li>
+					<li><a href="#">Sort by Class</a></li>
+				</ul>
+			</div>
+		</div><!-- /header -->
+
+		<div data-role="content" data-theme="d">	
+			<h2>Homework</h2>
+			<p>I have an id of "hw" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
+			<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
+		</div><!-- /content -->
+		
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
+			<ul>
+				<li><a href="#pg1" id="email" data-icon="custom" data-transition="none">Timetable</a></li>
+				<li><a href="#" id="coffee" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist">Homework</a></li>
+				<li><a href="#settings" id="skull" data-icon="custom" data-transition="none">Settings</a></li>
+			</ul>
+			</div>
 		</div>
-	</div>
-</div><!-- /page hw -->
+	</div><!-- /page hw -->
 
 
-<div data-role="page" id="settings">
+	<div data-role="page" id="settings" data-theme="d">
 
-	<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
-		<h1>Homework</h1>
-		<div data-role="navbar">
-		<ul>
-			<li><a href="#"  class="ui-btn-active ui-state-persist">Sort by Date</a></li>
-			<li><a href="#">Sort by Class</a></li>
-		</ul>
-	</div>
-	</div><!-- /header -->
+		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<h1>Homework</h1>
+		</div><!-- /header -->
 
-	<div data-role="content" data-theme="d">	
-		<h2>Settings</h2>
-		<p>I have an id of "settings" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
-		<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
-	</div><!-- /content -->
-	
-	<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
-		<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
-		<ul>
-			<li><a href="#pg1" id="email" data-icon="custom">Timetable</a></li>
-			<li><a href="#hw" id="coffee" data-icon="custom">Homework</a></li>
-			<li><a href="#" id="skull" data-icon="custom" class="ui-btn-active ui-state-persist">Settings</a></li>
-		</ul>
+		<div data-role="content" data-theme="d">	
+			<h2>Settings</h2>
+			<p>I have an id of "settings" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
+			<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
+		</div><!-- /content -->
+		
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
+			<ul>
+				<li><a href="#pg1" id="email" data-icon="custom" data-transition="none">Timetable</a></li>
+				<li><a href="#hw" id="coffee" data-icon="custom" data-transition="none">Homework</a></li>
+				<li><a href="#" id="skull" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist">Settings</a></li>
+			</ul>
+			</div>
 		</div>
-	</div>
-</div><!-- /page settings -->
+	</div><!-- /page settings -->
 
-</body>
+	</body>
 </html>
