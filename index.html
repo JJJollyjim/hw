@@ -170,7 +170,7 @@
 
 			.ui-page {
 				-webkit-backface-visibility: hidden;
-				//overflow: hidden;
+				/*overflow: hidden;*/
 			}
 
 			.nav-glyphish-example .ui-btn .ui-btn-inner { padding-top: 40px !important; }
@@ -215,13 +215,17 @@
 		    -webkit-animation-duration: 250ms !important;
 			}
 
+			.header {position:fixed;z-index:10;top:0;width:100%}
+			.content {padding:45px 15px}
+			.footer {position:fixed;z-index:10;bottom:0;width:100%}
+
 		</style>
 	</head>
 	<body> 
 
 	<!-- Start of first page: #pg1 -->
 	<div data-role="page" id="pg1" data-theme="d">
-		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header"         data-tap-toggle="false" data-id="linked">
 			<h1 class="dayTitle">Today</h1>
 			<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
 			<div data-role="navbar" class="np-page no-blue">
@@ -241,11 +245,11 @@
 
 		</div><!-- /content -->
 		
-		<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
+		<!-- <div data-role="footer"         data-tap-toggle="false" data-theme="d">
 			<h4>Page Footer</h4>
 		</div> --><!-- /footer -->
 		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c"         data-tap-toggle="false" data-id="linked">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
 				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist email">Timetable</a></li>
@@ -259,7 +263,7 @@
 
 	<!-- Start of third page: #pg2 -->
 	<div data-role="page" id="pg2" data-theme="d">
-		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header"         data-tap-toggle="false" data-id="linked">
 			<h1 class="dayTitle">Today</h1>
 			<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
 			<div data-role="navbar" class="np-page no-blue">
@@ -280,11 +284,11 @@
 			<p><a href="#pg2"data-role="button" data-transition="slide">Slide</a></p>
 		</div><!-- /content -->
 		
-		<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
+		<!-- <div data-role="footer"         data-tap-toggle="false" data-theme="d">
 			<h4>Page Footer</h4>
 		</div> --><!-- /footer -->
 		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c"         data-tap-toggle="false" data-id="linked">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
 				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist email">Timetable</a></li>
@@ -298,7 +302,7 @@
 
 	<div data-role="page" id="hw" data-theme="d">
 
-		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header"         data-tap-toggle="false" data-id="linked">
 			<h1>Homework</h1>
 			<div data-role="navbar">
 				<ul>
@@ -314,7 +318,7 @@
 			<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
 		</div><!-- /content -->
 		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c"         data-tap-toggle="false" data-id="linked">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
 				<li><a href="#pg1" class="email" data-icon="custom" data-transition="none">Timetable</a></li>
@@ -328,7 +332,7 @@
 
 	<div data-role="page" id="settings" data-theme="d">
 
-		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header"         data-tap-toggle="false" data-id="linked">
 			<h1>Homework</h1>
 		</div><!-- /header -->
 
@@ -338,7 +342,7 @@
 			<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
 		</div><!-- /content -->
 		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c"         data-tap-toggle="false" data-id="linked">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
 				<li><a href="#pg1" class="email" data-icon="custom" data-transition="none">Timetable</a></li>
