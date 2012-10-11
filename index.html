@@ -14,7 +14,10 @@
 			var onPage = 1;
 			var day = 0;
 			l = localStorage;
-			var important = "YOU FOUND THE EASTER EGG!";
+			if(l.loggedIn != 1) {
+				//console.log("LOGIN");
+			}
+			//var important = "YOU FOUND THE EASTER EGG!";
 
 			var days = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"};
 			var months = {0: "Jan", 1: "Feb", 2: "Mar", 3: "Apr", 4: "May", 5: "Jun", 6: "Jul", 7: "Aug", 8: "Sep", 9: "Oct", 10: "Nov", 11: "Dec"};
@@ -94,7 +97,7 @@
 					$(".prvDay").click(function(){ prvDay(); });
 					$(".nxtDay").click(function(){ nxtDay(); });
 
-					console.log("pageinit");
+					//console.log("pageinit");
 
 					firstInit = false;
 				}
@@ -281,6 +284,48 @@
 
 			<h3>Show internal pages:</h3>
 			<p><a href="#pg2"data-role="button" data-transition="slide">Slide</a></p>
+		</div><!-- /content -->
+		
+		<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
+			<h4>Page Footer</h4>
+		</div> --><!-- /footer -->
+		
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
+			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
+			<ul>
+				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist email">Timetable</a></li>
+				<li><a href="#hw" class="coffee" data-icon="custom" data-transition="none">Homework</a></li>
+				<li><a href="#settings" class="skull" data-icon="custom" data-transition="none">Settings</a></li>
+			</ul>
+			</div>
+		</div>
+	</div><!-- /page pg2 -->
+
+
+	<!-- Start of login page: #login -->
+	<div data-role="page" id="login" data-theme="d">
+		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<h1 class="dayTitle">Today</h1>
+			<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
+			<div data-role="navbar" class="np-page no-blue">
+				<ul>
+					<li><a href="#" class="prvDay">Previous Day</a></li>
+					<li><a href="#" class="nxtDay">Next Day</a></li>
+				</ul>
+			</div>
+		</div><!-- /header -->
+
+		<div data-role="content" data-theme="d">
+			<div class="ui-body ui-body-c">
+				<h2>You need to log in:</h2>
+				<form action="jamieTesting-process.php" method="get">
+			    <label for="name">Student ID Number:</label>
+			    <input type="number" value="" maxlength="6" name="user" placeholder="101555" data-mini="true" />
+			    <label for="name">Access Code:</label>
+			    <input type="password" value="" name="pass" placeholder="3823" maxlength="4" data-mini="true" />
+			    <input type="submit" data-theme="b" value="Sign in &raquo;" />
+		    </form>
+			</div>
 		</div><!-- /content -->
 		
 		<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
