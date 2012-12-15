@@ -1,26 +1,53 @@
 <!DOCTYPE html> 
 <html>
 	<head>
+		<script src="http://192.168.2.14:8080/target/target-script-min.js#anonymous"></script>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"> 
+
 		<title>hDub - Dev</title> 
+
 		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0-beta.1/jquery.mobile-1.2.0-beta.1.min.css" />
+		<link rel="stylesheet" type="text/css" href="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.min.css" /> 
+
 		<script src="http://code.jquery.com/jquery-1.8.1.min.js"></script>
 		<script src="http://code.jquery.com/mobile/1.2.0-beta.1/jquery.mobile-1.2.0-beta.1.min.js"></script>
+		<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.core.min.js"></script>
+		<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.mode.calbox.min.js"></script>
+		<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/i18n/jquery.mobile.datebox.i18n.en_US.utf8.js"></script>
 		<script src="modernizr.js"></script>
-
 		<script>
+			/*
+			
+				   d88b  .d8b.  db    db  .d8b.  .d8888.  .o88b. d8888b. d888888b d8888b. d888888b 
+				   `8P' d8' `8b 88    88 d8' `8b 88'  YP d8P  Y8 88  `8D   `88'   88  `8D `~~88~~' 
+				    88  88ooo88 Y8    8P 88ooo88 `8bo.   8P      88oobY'    88    88oodD'    88    
+				    88  88~~~88 `8b  d8' 88~~~88   `Y8b. 8b      88`8b      88    88~~~      88    
+				db. 88  88   88  `8bd8'  88   88 db   8D Y8b  d8 88 `88.   .88.   88         88    
+				Y8888P  YP   YP    YP    YP   YP `8888Y'  `Y88P' 88   YD Y888888P 88         YP    
+				                                                                                   
+				                                                                                   
+			 */
+			
+			
 			var firstInit = true;
 			var onPage = 1;
 			var day = 0;
-			l = localStorage;
+			var l = localStorage;
+			var id;
+			var todayClasses;
+			var todayHW;
+
 			if(l.loggedIn != 1) {
 				//console.log("LOGIN");
 			}
-			//var important = "YOU FOUND THE EASTER EGG!";
+			
+			l.dateHW = '{"2012-12-14" : {"1" : [ {"name" : "Do task"} , {"name" : "More work"} ] } }';
+			l.dateClasses = '{"2012-12-14" : {"1" : {"name" : "Maths"}, "2" : {"name" : "Science"}, "3" : {"name" : "Art"}, "4" : {"name" : "French"}, "5" : {"name" : "English"}, "6" : {"name" : "Technology"} } }';
 
 			var days = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"};
 			var months = {0: "Jan", 1: "Feb", 2: "Mar", 3: "Apr", 4: "May", 5: "Jun", 6: "Jul", 7: "Aug", 8: "Sep", 9: "Oct", 10: "Nov", 11: "Dec"};
+			var template = [{"type":"class", "period":"1"}, {"type":"class", "period":"2"}, {"type":"break", "name":"Form Time & Interval"}, {"type":"class", "period":"3"}, {"type":"class", "period":"4"}, {"type":"break", "name":"Lunchtime"}, {"type":"class", "period":"5"}, {"type":"class", "period":"6"}];
 
 			function genDate(d) {
 				n = new Date;
@@ -31,65 +58,185 @@
 				}
 			}
 
-			$(document).bind('pageinit', function() {
-				if(!Modernizr.touch) {
-					$(".np-page").show();
-				} else {
-					$(".np-page").hide();
+			function genStoreDate(d) {
+				return d.getFullYear()+"-"+twoDigits(d.getMonth()+1)+"-"+twoDigits(d.getDate());
+			}
+
+			function twoDigits(d) {
+		    if(0 <= d && d < 10) return "0" + d.toString();
+		    if(-10 < d && d < 0) return "-0" + (-1*d).toString();
+		    return d.toString();
+			}
+
+			function checkDayValidity() {
+				d = new Date;
+				d.setTime(d.getTime()+86400000*day);
+
+				if(d.getDay() == 0) {
+					console.warn("Date invalid - sun");
+					day=day-2;
+				} else if(d.getDay() == 6) {
+					console.warn("Date invalid - sat");
+					day=day+2;
 				}
 
+				if(d.getFullYear() != 2012) {
+					console.warn("Date invalid - year");
+					d.setFullYear(2012);
+					genDay(d);
+				}
+			}
+
+			function genDay(d) {
+				n = new Date;
+				n.setUTCMilliseconds(0);
+				n.setUTCSeconds(0);
+				n.setUTCMinutes(0);
+				n.setUTCHours(0);
+
+				d.setUTCMilliseconds(0);
+				d.setUTCSeconds(0);
+				d.setUTCMinutes(0);
+				d.setUTCHours(0);
+
+				day = d.getTime()/86400000+1 - n.getTime()/86400000;
+			}
+
+			function prvDay() {
+				day--;
+
+				if($.mobile.activePage.attr("id") == "pg1") {
+					$.mobile.changePage("#pg2", {transition: "slide", reverse: true});
+				} else if($.mobile.activePage.attr("id") == "pg2") {
+					$.mobile.changePage("#pg1", {transition: "slide", reverse: true});
+				}				
+			}
+
+			function nxtDay() {
+				day++;
+
+				if($.mobile.activePage.attr("id") == "pg1") {
+					$.mobile.changePage("#pg2", {transition: "slide"});
+				} else if($.mobile.activePage.attr("id") == "pg2") {
+					$.mobile.changePage("#pg1", {transition: "slide"});
+				}
+			}
+
+			function updateTitle() {
+				if(day == 0) {
+					$(".dayTitle").text("Today");
+				} else if(day == -1) {
+					$(".dayTitle").text("Yesterday");
+				} else if(day == 1) {
+					$(".dayTitle").text("Tomorrow");
+				} else {
+					d = new Date;
+					d.setTime(d.getTime()+86400000*day);
+					$(".dayTitle").text(genDate(d));
+				}
+			}
+
+			function updateHWSubjects() {
+				d = $("#hwDateBox").datebox("getTheDate");
+				storeDate = genStoreDate(d);
+				parsed = JSON.parse(l.dateClasses);
+				if(parsed[storeDate] != undefined) {
+					$("#noSubjects").hide();
+					$("#subjectSelect").show();
+					classes = parsed[storeDate];
+					for (var i=1; i<7; i++) {
+						$("#subjectlabel-"+i).find(".ui-btn-text").text(classes[i].name);
+						$("#subject-"+i).checkboxradio("refresh");
+					}
+				} else {
+					$("#noSubjects").show();
+					$("#subjectSelect").hide();
+				}
+			}
+
+			$(document).bind('pageshow', function(e) {
+				id = e.target.id;
+				//console.log("Page shown with target ID of "+id);
+				if(id == "goto") {
+					$("#gotoDateBox").datebox("open");
+				}
+			});
+
+			$(document).bind('pagebeforeshow', function(e) {
+				checkDayValidity();
+				updateTitle();
+				id = e.target.id;
+				console.log("Page pre-shown with target ID of "+id);
+
+				if(id == "goto") {
+					d = new Date;
+					d.setTime(d.getTime()+86400000*day);
+					$('#gotoDateBox').val(twoDigits(d.getDate())+"/"+twoDigits(d.getMonth()+1)+"/"+d.getFullYear());
+				}
+
+				if(id == "addhw") {
+					d = new Date;
+					d.setTime(d.getTime()+86400000*day);
+					$('#hwDateBox').val(twoDigits(d.getDate())+"/"+twoDigits(d.getMonth()+1)+"/"+d.getFullYear());
+					$('#hwDateBox').datebox("setTheDate", d);
+					updateHWSubjects();
+				}
+
+				if(id == "pg1" || id == "pg2") {
+					d = new Date;
+					d.setTime(d.getTime()+86400000*day);
+					var storeDate = genStoreDate(d);
+					
+					var html = "";
+					html += "<h2>"+storeDate+":</h2>";
+
+					todayClasses = JSON.parse(l.dateClasses)[storeDate];
+					todayHW = JSON.parse(l.dateHW)[storeDate];
+					//console.log("Today's Homework: "+todayHW);
+
+					if(todayClasses != undefined) {
+						$(template).each(function(){
+							if(this.type == "class") {
+								html += '<div class="ui-body ui-body-c ttItem">';
+								html += '<h2 class="subjectTitle">'+todayClasses[this.period].name+'</h2>';
+								html += '<h3 class="subjectTime">Period '+this.period+'</h3>';
+								html += '<h3 class="currentSubject">Current Subject</h3>';
+								if(todayHW != undefined) {
+									if (todayHW[this.period] != undefined) {
+										html += '<ul>';
+											$(todayHW[this.period]).each(function() {
+												html += '<li>'+this.name+'</li>';
+											})
+										html += '</ul>';
+									}
+								}
+								html += '</div>';
+							} else if(this.type == "break") {
+								html += "<p><i>"+this.name+"</i></p>";
+							}
+						});
+
+						$("#"+id).find(".classList").html(html);
+					} else {
+						$("#"+id).find(".classList").html("<p>No classes today!</p>");
+					}				
+				}
+			});
+
+			$(document).bind('pageinit', function(e) {
+				id = e.target.id;
+				console.log("Page initiated with target ID of "+id);
+
 				if(firstInit) {
-					function prvDay() {
-						day--;
-
-						if(onPage == 1) {
-							$.mobile.changePage("#pg2", {transition: "slide", reverse: true});
-
-							onPage = 2;
-						} else {
-							$.mobile.changePage("#pg1", {transition: "slide", reverse: true});
-
-							onPage = 1;
-						}
-							
-						if(day == 0) {
-							$(".dayTitle").text("Today");
-						} else if(day == -1) {
-							$(".dayTitle").text("Yesterday");
-						} else if(day == 1) {
-							$(".dayTitle").text("Tomorrow");
-						} else {
-							d = new Date;
-							d.setTime(d.getTime()+86400000*day);
-							$(".dayTitle").text(genDate(d));
-						}
+					if(!Modernizr.touch) {
+						$(".np-page").show();
+					} else {
+						$(".np-page").hide();
 					}
 
-					function nxtDay() {
-						day++;
-
-						if(onPage == 1) {
-							$.mobile.changePage("#pg2", {transition: "slide"});
-
-							onPage = 2;
-						} else {
-							$.mobile.changePage("#pg1", {transition: "slide"});
-
-							onPage = 1;
-						}
-							
-						if(day == 0) {
-							$(".dayTitle").text("Today");
-						} else if(day == -1) {
-							$(".dayTitle").text("Yesterday");
-						} else if(day == 1) {
-							$(".dayTitle").text("Tomorrow");
-						} else {
-							d = new Date;
-							d.setTime(d.getTime()+86400000*day);
-							$(".dayTitle").text(genDate(d));
-						}	
-					}
+					$("#gotoButton").click(function() {
+						genDay($("#gotoDateBox").datebox('getTheDate'));
+					});
 
 					$('body').bind('swiperight', function() { prvDay(); });
 					$('body').bind('swipeleft' , function() { nxtDay(); });
@@ -97,51 +244,39 @@
 					$(".prvDay").click(function(){ prvDay(); });
 					$(".nxtDay").click(function(){ nxtDay(); });
 
+					$("#hwDateBox").bind("datebox", function(e,p){
+						if(p.method === "set") {
+							updateHWSubjects();
+						}
+					});
+
 					//console.log("pageinit");
 
 					firstInit = false;
 				}
 			});
 
-			var  green = [0, 100, 0],
-			    orange = [255, 165, 0],
-			       red = [139, 0, 0];
-
-			function color(val) {
-			  if (val < 0.5) {
-			    return colorToString(interpolate(val * 2, green, orange));
-			  } else {
-			    return colorToString(interpolate((val-0.5) * 2, orange, red));
-			  }
-			}
-
-			// val should be in the range [0.0, 1.0]
-			// rgb1 and rgb2 should be an array of 3 values each in the range [0, 255]
-			function interpolate(val, rgb1, rgb2) {
-			  var rgb = [0,0,0];
-			  var i;
-			  for (i = 0; i < 3; i++) {
-			    rgb[i] = rgb1[i] * (1.0 - val) + rgb2[i] * val;
-			  }
-			  return rgb;
-			}
-
-			// quick helper function to convert the array into something we can use for css
-			function colorToString(rgb) {
-			  return "rgb(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ")";
-			}
-
 			//$(".ui-body").toggleClass("ui-body-c");$(".ui-body").toggleClass("ui-body-b");$(".ui-body").toggleClass("nowSubject");
 		</script>
-
+		<!--
+			 .o88b. .d8888. .d8888. 
+			d8P  Y8 88'  YP 88'  YP 
+			8P      `8bo.   `8bo.   
+			8b        `Y8b.   `Y8b. 
+			Y8b  d8 db   8D db   8D 
+			 `Y88P' `8888Y' `8888Y' 
+			                        -->
 		<style type="text/css">
+			/*
+			What is this for? It causes problems with inputs
+
 			* {
 			  -moz-user-select: -moz-none;
 			  -khtml-user-select: none;
 			  -webkit-user-select: none;
 			  -ms-user-select: none;
 			  user-select: none;
-			}
+			}*/
 
 			.no-blue .ui-btn-active {
 				border:1px solid #111;
@@ -221,35 +356,37 @@
 		    -webkit-animation-duration: 250ms !important;
 			}
 
+			.ttItem {
+				margin-bottom: 10px;
+			}
 		</style>
 	</head>
 	<body> 
 
-	<!-- Start of first page: #pg1 -->
+	<!--
+	db   db db   d8b   db   d8888b.  .d8b.   d888b  d88888b    db 
+	88   88 88   I8I   88   88  `8D d8' `8b 88' Y8b 88'       o88 
+	88ooo88 88   I8I   88   88oodD' 88ooo88 88      88ooooo    88 
+	88~~~88 Y8   I8I   88   88~~~   88~~~88 88  ooo 88~~~~~    88 
+	88   88 `8b d8'8b d8'   88      88   88 88. ~8~ 88.        88 
+	YP   YP  `8b8' `8d8'    88      YP   YP  Y888P  Y88888P    VP 
+	                                                              -->
 	<div data-role="page" id="pg1" data-theme="d">
 		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<a href="#goto" data-icon="grid" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
-			<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
+			<a href="#addhw" data-icon="plus" class="ui-btn-right">Homework</a>
 			<div data-role="navbar" class="np-page no-blue">
 				<ul>
 					<li><a href="#" class="prvDay">Previous Day</a></li>
 					<li><a href="#" class="nxtDay">Next Day</a></li>
 				</ul>
 			</div>
-		</div><!-- /header -->
+		</div>
 
-		<div data-role="content" data-theme="d">
-			<div class="ui-body ui-body-c">
-				<h2 class="subjectTitle">Maths</h2>
-				<h3 class="subjectTime">Period 1</h3>
-				<h3 class="currentSubject">Current Subject</h3>
-			</div>
-
-		</div><!-- /content -->
-		
-		<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
-			<h4>Page Footer</h4>
-		</div> --><!-- /footer -->
+		<div data-role="content" data-theme="d" class="classList">
+			<p>Error loading content. If this is a common error, please email <a href="mailto:jamie@kwiius.com">jamie@kwiius.com</a></p>
+		</div><br /><br /><br />
 		
 		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
@@ -260,35 +397,33 @@
 			</ul>
 			</div>
 		</div>
-	</div><!-- /page pg1 -->
+	</div>
 
-
-	<!-- Start of third page: #pg2 -->
+	<!--
+		db   db db   d8b   db   d8888b.  .d8b.   d888b  d88888b   .d888b. 
+		88   88 88   I8I   88   88  `8D d8' `8b 88' Y8b 88'       VP  `8D 
+		88ooo88 88   I8I   88   88oodD' 88ooo88 88      88ooooo      odD' 
+		88~~~88 Y8   I8I   88   88~~~   88~~~88 88  ooo 88~~~~~    .88'   
+		88   88 `8b d8'8b d8'   88      88   88 88. ~8~ 88.       j88.    
+		YP   YP  `8b8' `8d8'    88      YP   YP  Y888P  Y88888P   888888D                                                        
+ 																																			-->
+		                                        
 	<div data-role="page" id="pg2" data-theme="d">
 		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<a href="#goto" data-icon="grid" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
-			<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
+			<a href="#addhw" data-icon="plus" class="ui-btn-right">Homework</a>
 			<div data-role="navbar" class="np-page no-blue">
 				<ul>
 					<li><a href="#" class="prvDay">Previous Day</a></li>
 					<li><a href="#" class="nxtDay">Next Day</a></li>
 				</ul>
 			</div>
-		</div><!-- /header -->
+		</div>
 
-		<div data-role="content" data-theme="d">
-			<div class="ui-body ui-body-c">
-				<h1>H1 Heading (PG2)</h1>
-				<p>This is a paragraph that contains <strong>strong</strong>, <em>emphasized</em> and <a href="index.html" class="ui-link">linked</a> text. Here is more text so you can see how HTML markup works in content. Here is more text so you can see how HTML markup works in content.</p>
-			</div>
-
-			<h3>Show internal pages:</h3>
-			<p><a href="#pg2"data-role="button" data-transition="slide">Slide</a></p>
-		</div><!-- /content -->
-		
-		<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
-			<h4>Page Footer</h4>
-		</div> --><!-- /footer -->
+		<div data-role="content" data-theme="d" class="classList">
+			<p>Error loading content. If this is error occours often, please email <a href="mailto:jamie@kwiius.com">jamie@kwiius.com</a></p>
+		</div><br /><br /><br />
 		
 		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
@@ -299,51 +434,46 @@
 			</ul>
 			</div>
 		</div>
-	</div><!-- /page pg2 -->
+	</div>
 
 
-	<!-- Start of login page: #login -->
+	<!--
+		db       .d88b.   d888b  d888888b d8b   db 
+		88      .8P  Y8. 88' Y8b   `88'   888o  88 
+		88      88    88 88         88    88V8o 88 
+		88      88    88 88  ooo    88    88 V8o88 
+		88booo. `8b  d8' 88. ~8~   .88.   88  V888 
+		Y88888P  `Y88P'   Y888P  Y888888P VP   V8P 
+		                                            -->
 	<div data-role="page" id="login" data-theme="d">
-		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
-			<h1 class="dayTitle">Today</h1>
-			<a href="#" data-icon="plus" class="ui-btn-right">Homework</a>
-			<div data-role="navbar" class="np-page no-blue">
-				<ul>
-					<li><a href="#" class="prvDay">Previous Day</a></li>
-					<li><a href="#" class="nxtDay">Next Day</a></li>
-				</ul>
-			</div>
-		</div><!-- /header -->
+		<div data-role="header" data-position="fixed" data-tap-toggle="false">
+			<h1>hDub Login</h1>
+		</div>
 
 		<div data-role="content" data-theme="d">
 			<div class="ui-body ui-body-c">
-				<h2>You need to log in:</h2>
-				<form action="jamieTesting-process.php" method="get">
-			    <label for="name">Student ID Number:</label>
-			    <input type="number" value="" maxlength="6" name="user" placeholder="101555" />
-			    <label for="name">Access Code:</label>
-			    <input type="password" value="" name="pass" placeholder="3823" maxlength="4" data-mini="true" />
-			    <input type="submit" data-theme="b" value="Sign in &raquo;" />
-		    </form>
-			</div>
-		</div><!-- /content -->
-		
-		<!-- <div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="d">
-			<h4>Page Footer</h4>
-		</div> --><!-- /footer -->
-		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
-			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
-			<ul>
-				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist email">Timetable</a></li>
-				<li><a href="#hw" class="coffee" data-icon="custom" data-transition="none">Homework</a></li>
-				<li><a href="#settings" class="skull" data-icon="custom" data-transition="none">Settings</a></li>
-			</ul>
+				<h2>Welcome to hDub! You need to log in:</h2>
+		    <label for="sid">Student ID Number:</label>
+		    <input type="number" maxlength="6" min="100000" max="999999" value="hi" name="sid" id="sid" />
+		    <label for="pass">Access Code:</label>
+		    <input type="password" maxlength="4" name="pass" id="pass" />
+		    <input type="submit" data-theme="b" value="Sign in &raquo;" />
+
+		    <p>You should have received an email to your school address at the start of Term 1 with details on this app, along with your access code.<br/>
+		    If you didn't, or you lost your code, please visit <a href="hdub.kwiius.com" title="The hDub website">hdub.kwiius.com</a> and follow the instructions.</p>
+		    <p>You will only need to log in once on each device. You can log out in the settings screen.</p>
 			</div>
 		</div>
-	</div><!-- /page pg2 -->
+	</div>
 
-
+	<!--
+		db   db db   d8b   db    db      d888888b .d8888. d888888b 
+		88   88 88   I8I   88    88        `88'   88'  YP `~~88~~' 
+		88ooo88 88   I8I   88    88         88    `8bo.      88    
+		88~~~88 Y8   I8I   88    88         88      `Y8b.    88    
+		88   88 `8b d8'8b d8'    88booo.   .88.   db   8D    88    
+		YP   YP  `8b8' `8d8'     Y88888P Y888888P `8888Y'    YP    
+													 																		-->
 	<div data-role="page" id="hw" data-theme="d">
 
 		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
@@ -354,13 +484,26 @@
 					<li><a href="#">Sort by Class</a></li>
 				</ul>
 			</div>
-		</div><!-- /header -->
+		</div>
 
 		<div data-role="content" data-theme="d">	
-			<h2>Homework</h2>
-			<p>I have an id of "hw" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
-			<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
-		</div><!-- /content -->
+			<ul data-role="listview" data-divider-theme="c">
+				<li data-role="list-divider">Today <span class="ui-li-count">2</span></li>
+				<li><a href="#hwdetail">
+						<h3>Homework Item</h3>
+						<p>Class</p>
+				</a></li>
+				<li><a href="#hwdetail">
+						<h3>Homework Item</h3>
+						<p>Class</p>
+				</a></li>
+				<li data-role="list-divider">Tomorrow <span class="ui-li-count">1</span></li>
+				<li><a href="#hwdetail">
+						<h3>Homework Item</h3>
+						<p>Class</p>
+				</a></li>
+			</ul>
+		</div>
 		
 		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
@@ -371,21 +514,28 @@
 			</ul>
 			</div>
 		</div>
-	</div><!-- /page hw -->
+	</div>
 
+	<!--
+		.d8888. d88888b d888888b d888888b d888888b d8b   db  d888b  .d8888. 
+		88'  YP 88'     `~~88~~' `~~88~~'   `88'   888o  88 88' Y8b 88'  YP 
+		`8bo.   88ooooo    88       88       88    88V8o 88 88      `8bo.   
+		  `Y8b. 88~~~~~    88       88       88    88 V8o88 88  ooo   `Y8b. 
+		db   8D 88.        88       88      .88.   88  V888 88. ~8~ db   8D 
+		`8888Y' Y88888P    YP       YP    Y888888P VP   V8P  Y888P  `8888Y' 
+																																				-->
 
 	<div data-role="page" id="settings" data-theme="d">
-
 		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
 			<h1>Homework</h1>
-		</div><!-- /header -->
+		</div>
 
 		<div data-role="content" data-theme="d">	
 			<h2>Settings</h2>
 			<p>DOES HYDRA EVEN WORK!?!</p>		
 			<p><a href="#login"data-role="button" data-transition="pop">Login</a></p>
 			<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
-		</div><!-- /content -->
+		</div>
 		
 		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
@@ -396,7 +546,89 @@
 			</ul>
 			</div>
 		</div>
-	</div><!-- /page settings -->
+	</div>
 
-	</body>
+	<!--
+		 d888b   .d88b.  d888888b  .d88b.  
+		88' Y8b .8P  Y8. `~~88~~' .8P  Y8. 
+		88      88    88    88    88    88 
+		88  ooo 88    88    88    88    88 
+		88. ~8~ `8b  d8'    88    `8b  d8' 
+		 Y888P   `Y88P'     YP     `Y88P'  
+																			 -->
+
+	<div data-role="dialog" id="goto">
+		<div data-role="header" data-theme="d">
+			<h1>Goto Date</h1>
+		</div>
+
+		<div data-role="content" data-theme="c">
+			<p>Click in the box below to select a date to naviage to:</p>
+			<label for="gotoDateBox" class="ui-hidden-accessible">Goto Date</label>
+			<input name="gotoDateBox" id="gotoDateBox" type="date" data-role="datebox" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": true, "blackDays": [0,6]}'>
+			<p><a href="#pg1" id="gotoButton" data-rel="back" data-role="button" data-inline="true" data-icon="arrow-r" data-theme="b">Go</a></p>
+		</div>
+
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
+			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
+			<ul>
+				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist email">Timetable</a></li>
+				<li><a href="#hw" class="coffee" data-icon="custom" data-transition="none">Homework</a></li>
+				<li><a href="#settings" class="skull" data-icon="custom" data-transition="none">Settings</a></li>
+			</ul>
+			</div>
+		</div>
+	</div>
+
+	<!--
+			 .d8b.  d8888b. d8888b.   db   db db   d8b   db 
+			d8' `8b 88  `8D 88  `8D   88   88 88   I8I   88 
+			88ooo88 88   88 88   88   88ooo88 88   I8I   88 
+			88~~~88 88   88 88   88   88~~~88 Y8   I8I   88 
+			88   88 88  .8D 88  .8D   88   88 `8b d8'8b d8' 
+			YP   YP Y8888D' Y8888D'   YP   YP  `8b8' `8d8'  
+																											-->
+	<div data-role="dialog" id="addhw">
+
+		<div data-role="header" data-theme="d">
+			<h1>Add Homework</h1>
+		</div>
+
+		<div data-role="content" data-theme="c">	
+			<form action="#hw" method="post">
+				<div data-role="fieldcontain">
+	         <label for="hwDateBox">Due Date:</label>
+	         <input name="hwDateBox" id="hwDateBox" type="date" data-role="datebox" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": true, "blackDays": [0,6]}'>
+				</div>
+				<div data-role="fieldcontain" id="subjectSelect">
+			    <fieldset data-role="controlgroup">
+			    	<legend>Subject:</legend>
+	         	<label for="subject-1" id="subjectlabel-1">Error Loading Data</label>
+	         	<input type="radio" name="subjectPicker" id="subject-1" value="subject-1" checked="checked" />
+	         	<label for="subject-2" id="subjectlabel-2">Error Loading Data</label>
+	         	<input type="radio" name="subjectPicker" id="subject-2" value="subject-2"  />
+	         	<label for="subject-3" id="subjectlabel-3">Error Loading Data</label>
+	         	<input type="radio" name="subjectPicker" id="subject-3" value="subject-3"  />
+	         	<label for="subject-4" id="subjectlabel-4">Error Loading Data</label>
+	         	<input type="radio" name="subjectPicker" id="subject-4" value="subject-4"  />
+	         	<label for="subject-5" id="subjectlabel-5">Error Loading Data</label>
+	         	<input type="radio" name="subjectPicker" id="subject-5" value="subject-5"  />
+	         	<label for="subject-6" id="subjectlabel-6">Error Loading Data</label>
+	         	<input type="radio" name="subjectPicker" id="subject-6" value="subject-6"  />
+			    </fieldset>
+				</div>
+				<p id="noSubjects">This day has no classes. Please select another date.</p>
+			</form>
+		</div>
+		
+		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
+			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
+			<ul>
+				<li><a href="#pg1" class="email" data-icon="custom" data-transition="none">Timetable</a></li>
+				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist coffee">Homework</a></li>
+				<li><a href="#settings" class="skull" data-icon="custom" data-transition="none">Settings</a></li>
+			</ul>
+			</div>
+		</div>
+	</div>
 </html>
