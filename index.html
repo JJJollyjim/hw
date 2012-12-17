@@ -1,3 +1,7 @@
+<!-- -===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===- -->
+<!-- Congratulations on finding this! Email jamie@kwiius.com to claim your prize!  -->
+<!-- -===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===- -->
+
 <!DOCTYPE html> 
 <html>
 	<head>
@@ -37,21 +41,37 @@
 			var id;
 			var todayClasses;
 			var todayHW;
+			var dayHasSubjects;
+			var editDayHasSubjects;
+			var firstCDV = true;
 
 			if(l.loggedIn != 1) {
 				//console.log("LOGIN");
 			}
 			
-			l.dateHW = '{"2012-12-14" : {"1" : [ {"name" : "Do task"} , {"name" : "More work"} ] } }';
-			l.dateClasses = '{"2012-12-14" : {"1" : {"name" : "Maths"}, "2" : {"name" : "Science"}, "3" : {"name" : "Art"}, "4" : {"name" : "French"}, "5" : {"name" : "English"}, "6" : {"name" : "Technology"} } }';
+			//l.dateHW = '{}';
+			l.dateClasses = '{"2012-12-14" : {"1" : {"name" : "Maths"}, "2" : {"name" : "Science"}, "3" : {"name" : "Art"}, "4" : {"name" : "French"}, "5" : {"name" : "English"}, "6" : {"name" : "Technology"} } , "2012-12-17" : {"1" : {"name" : "English"}, "2" : {"name" : "Music"}, "3" : {"name" : "French"}, "4" : {"name" : "Histroy"}, "5" : {"name" : "Technology"}, "6" : {"name" : "PE"} } , "2012-12-13" : {"1" : {"name" : "Turtle"}, "2" : {"name" : "Turtle"}, "3" : {"name" : "Turtle"}, "4" : {"name" : "Turtle"}, "5" : {"name" : "Turtle"}, "6" : {"name" : "Turtle"} } }';
 
 			var days = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"};
+			var supertexts = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th", 7: "th", 8: "th", 9: "th", 10: "th", 11: "th", 12: "th", 13: "th", 14: "th", 15: "th", 16: "th", 17: "th", 18: "th", 19: "th", 20: "th", 21: "st", 22: "nd", 23: "rd", 24: "th", 25: "th", 26: "th", 27: "th", 28: "th", 29: "th", 30: "th", 31: "st"};
 			var months = {0: "Jan", 1: "Feb", 2: "Mar", 3: "Apr", 4: "May", 5: "Jun", 6: "Jul", 7: "Aug", 8: "Sep", 9: "Oct", 10: "Nov", 11: "Dec"};
+			var fullMonths = {0: "Janurary", 1: "Feburary", 2: "March", 3: "April", 4: "May", 5: "June", 6: "July", 7: "August", 8: "September", 9: "October", 10: "November", 11: "December"};
 			var template = [{"type":"class", "period":"1"}, {"type":"class", "period":"2"}, {"type":"break", "name":"Form Time & Interval"}, {"type":"class", "period":"3"}, {"type":"class", "period":"4"}, {"type":"break", "name":"Lunchtime"}, {"type":"class", "period":"5"}, {"type":"class", "period":"6"}];
+			var pdTimes = {1: {1: [525,575], 2: [575,625], 3: [660,710], 4: [710,760], 5: [820,870], 6: [870,920]}}
 
 			function genDate(d) {
 				n = new Date;
-				if (d.getMonth() == n.getMonth()) {
+				n = resetHrs(n);
+				d = resetHrs(d);
+				nt = n.getTime()/86400000;
+				dt = d.getTime()/86400000;
+				if(dt == nt) {
+					return "Today";
+				} else if (dt+1 == nt) {
+					return "Yesterday";
+				} else if (dt-1 == nt) {
+					return "Tomorrow";
+				} else if (d.getMonth() == n.getMonth()) {
 					return days[d.getDay()] + " " + d.getDate();
 				} else {
 					return days[d.getDay()] + " " + d.getDate() + " " + months[d.getMonth()];
@@ -68,38 +88,63 @@
 		    return d.toString();
 			}
 
+			function sortOBJ(o) {
+				keys = Object.keys(o);
+    		len = keys.length;
+    		out = {};
+
+				keys.sort();
+
+				for (i = 0; i < len; i++) {
+				  k = keys[i];
+				  out[k] = o[k];
+				}
+
+				return out;
+			}
+
 			function checkDayValidity() {
 				d = new Date;
 				d.setTime(d.getTime()+86400000*day);
 
 				if(d.getDay() == 0) {
-					console.warn("Date invalid - sun");
-					day=day-2;
+					if(!firstCDV) {
+						day=day-2;
+					} else {
+						day=day+1;
+					}
 				} else if(d.getDay() == 6) {
-					console.warn("Date invalid - sat");
 					day=day+2;
 				}
 
 				if(d.getFullYear() != 2012) {
-					console.warn("Date invalid - year");
 					d.setFullYear(2012);
 					genDay(d);
+				}
+
+				if(firstCDV) {
+					firstCDV = false;
 				}
 			}
 
 			function genDay(d) {
 				n = new Date;
-				n.setUTCMilliseconds(0);
-				n.setUTCSeconds(0);
-				n.setUTCMinutes(0);
-				n.setUTCHours(0);
+				n = resetHrs(n);
+				d = resetHrs(d);
 
+				day = d.getTime()/86400000+1 - n.getTime()/86400000;
+			}
+
+			function resetHrs(d) {
 				d.setUTCMilliseconds(0);
 				d.setUTCSeconds(0);
 				d.setUTCMinutes(0);
-				d.setUTCHours(0);
-
-				day = d.getTime()/86400000+1 - n.getTime()/86400000;
+				if(d.getHours() < Math.abs(d.getTimezoneOffset())/60) {
+					d.setUTCHours(24);
+				} else {
+					d.setUTCHours(0)
+				}
+				return d;
 			}
 
 			function prvDay() {
@@ -123,17 +168,14 @@
 			}
 
 			function updateTitle() {
-				if(day == 0) {
-					$(".dayTitle").text("Today");
-				} else if(day == -1) {
-					$(".dayTitle").text("Yesterday");
-				} else if(day == 1) {
-					$(".dayTitle").text("Tomorrow");
-				} else {
-					d = new Date;
-					d.setTime(d.getTime()+86400000*day);
-					$(".dayTitle").text(genDate(d));
-				}
+				d = new Date;
+				d.setTime(d.getTime()+86400000*day);
+				$(".dayTitle").text(genDate(d));
+			}
+
+			function dateFromStore(s) {
+				spl = s.split("-");
+				return new Date(spl[0], parseInt(spl[1])-1, spl[2]);
 			}
 
 			function updateHWSubjects() {
@@ -143,6 +185,10 @@
 				if(parsed[storeDate] != undefined) {
 					$("#noSubjects").hide();
 					$("#subjectSelect").show();
+					$("#taskInput").removeClass("ui-disabled");
+					$("#detailInput").removeClass("ui-disabled");
+					$("#hwSubmit").removeClass("ui-disabled");
+					dayHasSubjects = true;
 					classes = parsed[storeDate];
 					for (var i=1; i<7; i++) {
 						$("#subjectlabel-"+i).find(".ui-btn-text").text(classes[i].name);
@@ -151,7 +197,264 @@
 				} else {
 					$("#noSubjects").show();
 					$("#subjectSelect").hide();
+					$("#taskInput").addClass("ui-disabled");
+					$("#detailInput").addClass("ui-disabled");
+					$("#hwSubmit").addClass("ui-disabled");
+					dayHasSubjects = false;
 				}
+			}
+
+			function updateEditHWSubjects() {
+				d = $("#hwEditDateBox").datebox("getTheDate");
+				storeDate = genStoreDate(d);
+				parsed = JSON.parse(l.dateClasses);
+				if(parsed[storeDate] != undefined) {
+					$("#noEditSubjects").hide();
+					$("#subjectEditSelect").show();
+					$("#taskEditInput").removeClass("ui-disabled");
+					$("#detailEditInput").removeClass("ui-disabled");
+					$("#hwEditSubmit").removeClass("ui-disabled");
+					editDayHasSubjects = true;
+					classes = parsed[storeDate];
+					for (var i=1; i<7; i++) {
+						$("#subjectlabel-edit-"+i).find(".ui-btn-text").text(classes[i].name);
+						$("#subject-edit-"+i).checkboxradio("refresh");
+					}
+				} else {
+					$("#noEditSubjects").show();
+					$("#subjectEditSelect").hide();
+					$("#taskEditInput").addClass("ui-disabled");
+					$("#detailEditInput").addClass("ui-disabled");
+					$("#hwEditSubmit").addClass("ui-disabled");
+					editDayHasSubjects = false;
+				}
+			}
+
+			function addHomework() {
+				if(dayHasSubjects && $("#taskInput").val() != "" && $("#taskInput").val() != " ") {
+					//console.log("HW Submit!", $("#hwDateBox").datebox("getTheDate"), $(".subjectChoice:checked").val(), $("#taskInput").val(), $("#detailInput").val());
+					storeDate = genStoreDate($("#hwDateBox").datebox("getTheDate"));
+					classes = JSON.parse(l.dateClasses)[storeDate];
+					dhw = JSON.parse(l.dateHW);
+					classnum = parseInt($(".subjectChoice:checked").val().substr(8));
+
+					if(dhw[storeDate] == undefined) {
+						dhw[storeDate] = {};
+					}
+
+					if(dhw[storeDate][classnum] == undefined) {
+						dhw[storeDate][classnum] = [];
+					}
+
+					dhw[storeDate][classnum].push({name: $("#taskInput").val(), details: $("#detailInput").val()});
+
+					l.dateHW = JSON.stringify(dhw);
+					$.mobile.changePage("#hw", {transition: "pop", reverse: true});
+					setTimeout(function() {
+						$("#taskInput").val("");
+						$("#detailInput").val("");
+					}, 300);
+				}
+			}
+
+			function updateHWPage() {
+				dhw = JSON.parse(l.dateHW);
+				dhw = sortOBJ(dhw);
+				dcl = JSON.parse(l.dateClasses);
+				html = "";
+				if($(".hwSortBtn.ui-btn-active").length == 2) {
+					$("#classSortBtn").removeClass("ui-btn-active");
+				} else if($(".hwSortBtn.ui-btn-active").length == 0) {
+					$("#dateSortBtn").addClass("ui-btn-active");
+				}
+				allhwcount = 0;
+				if($(".hwSortBtn.ui-btn-active").attr("id") == "dateSortBtn") {
+					for (key in dhw) {
+						dhtml = "";
+						hwcount = 0;
+						for (key2 in dhw[key]) {
+							for (key3 in dhw[key][key2]) {
+								dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+'><a href="#hwdetail" class="hwListItemLink">';
+								dhtml += '<h3>'+dhw[key][key2][key3]["name"]+'</h3>';
+								dhtml += '<p>'+dcl[key][key2]["name"]+' (Period '+key2+')</p>';
+								dhtml += '</a></li>';
+								hwcount++;
+								allhwcount++;
+							}
+						}
+
+						if(hwcount > 0) {
+							html += '<li data-role="list-divider">'+genDate(dateFromStore(key))+' <span class="ui-li-count">'+hwcount+'</span></li>';
+						}
+						html += dhtml;
+					}
+				} else {
+					tempConstruct = [];
+					for (key in dhw) {
+						for (key2 in dhw[key]) {
+							for (key3 in dhw[key][key2]) {
+								className = dcl[key][key2]["name"];
+								if(tempConstruct[className] == undefined) {
+									tempConstruct[className] = [];
+								}
+								tempConstruct[className].push({date:key, period:key2, num:key3});
+							}
+						}
+					}
+
+					for(key4 in tempConstruct) {
+						chtml = "";
+						hwcount = 0;
+						for(key5 in tempConstruct[key4]) {
+							tc = tempConstruct[key4][key5];
+							
+							chtml += '<li class="hwListItem" data-date='+tc["date"]+' data-period='+tc["period"]+' data-num='+tc["num"]+'><a href="#hwdetail">';
+							chtml += '<h3>'+dhw[tc["date"]][tc["period"]][tc["num"]]["name"]+'</h3>';
+							chtml += '<p>'+genDate(dateFromStore(tc["date"]))+' (Period '+tc["period"]+')</p>';
+							chtml += '</a></li>';
+
+							hwcount++;
+							allhwcount++;
+						}
+						html += '<li data-role="list-divider">'+key4+' <span class="ui-li-count">'+hwcount+'</span></li>';
+						html += chtml;
+					}
+				}
+
+				if(allhwcount == 0) {
+					html = "<center><p><br>No homework here! Click the \"+ Homework\" button in the top right of the screen to add some. </p><p>Alternatively, why not ask your teacher to set you some more? :-P</p></center>";
+				}
+				
+				$("#hwList").html(html);
+				if(allhwcount != 0) {
+					$("#hwList").listview("refresh");
+				}
+			}
+
+			function updateTTPage() {
+				d = new Date;
+				d.setTime(d.getTime()+86400000*day);
+
+				t = new Date();
+				resetHrs(d);
+				resetHrs(t);
+				isToday = (t.getTime() == d.getTime());
+				
+				var storeDate = genStoreDate(d);
+				
+				var html = "";
+				todayClasses = JSON.parse(l.dateClasses)[storeDate];
+				todayHW = JSON.parse(l.dateHW)[storeDate];
+
+				if(todayClasses != undefined) {
+					$(template).each(function(){
+						if(this.type == "class") {
+							n = new Date();
+							now = n.getHours()*60+n.getMinutes();
+							isNow = (now>=pdTimes[1][this.period][0] && now < pdTimes[1][this.period][1]);
+
+							if(isToday && isNow) {
+								html += '<div class="ui-body ui-body-b nowSubject ttItem">';
+							} else {
+								html += '<div class="ui-body ui-body-c ttItem">';
+							}
+
+							html += '<h3 class="subjectTitle">'+todayClasses[this.period].name+'</h3>';
+
+							if(isToday && isNow) {
+								html += '<h5 class="currentSubject">Current Subject</h5>';
+							} else {
+								html += '<h4 class="subjectTime">Period '+this.period+'</h4>';
+							}
+
+							if(todayHW != undefined) {
+								if (todayHW[this.period] != undefined) {
+									html += '<ul>';
+										$(todayHW[this.period]).each(function() {
+											html += '<li>'+this.name+'</li>';
+										})
+									html += '</ul>';
+								}
+							}
+
+							html += '</div>';
+						} else if(this.type == "break") {
+							html += "<p><i>"+this.name+"</i></p>";
+						}
+					});
+
+					$("#"+id).find(".classList").html(html);
+				} else {
+					$("#"+id).find(".classList").html("<p>No classes today!</p>");
+				}
+			}
+
+			function delHW() {
+				dhw = JSON.parse(l.dateHW);
+				date = $("#hwDataStore").data("date");
+				period = $("#hwDataStore").data("period");
+				num = $("#hwDataStore").data("num");
+
+				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
+					dhw[date][period].splice(num, 1);
+					l.dateHW = JSON.stringify(dhw);
+					$.mobile.changePage("#hw", {reverse: true});
+				}
+			}
+
+			function editHW() {
+				dhw = JSON.parse(l.dateHW);
+
+				$("#hwDisplaySection").hide();
+				$("#hwEditSection").show();
+
+				sd = $("#hwDataStore").data("date");
+				d = dateFromStore(sd);
+				$('#hwEditDateBox').val(twoDigits(d.getDate())+"/"+twoDigits(d.getMonth()+1)+"/"+d.getFullYear());
+				$("#hwEditDateBox").datebox("setTheDate", d);
+
+				updateEditHWSubjects();
+
+				period = $("#hwDataStore").data("period");
+				$("#subject-edit-"+period).attr("checked", true);
+				$(".subjectEditChoice").checkboxradio("refresh");
+
+				num = $("#hwDataStore").data("num");
+				$("#taskEditInput").val(dhw[sd][period][num]["name"]);
+				$("#detailEditInput").val(dhw[sd][period][num]["details"]);
+			}
+
+			function noEditHW() {
+				$("#hwDisplaySection").show();
+				$("#hwEditSection").hide();	
+			}
+
+			function saveHWEdits() {
+				dhw = JSON.parse(l.dateHW);
+				
+				date = $("#hwDataStore").data("date");
+				period = $("#hwDataStore").data("period");
+				num = $("#hwDataStore").data("num");
+
+				dhw[date][period].splice(num, 1);
+
+				jsDate = $("#hwEditDateBox").datebox("getTheDate");
+				date = genStoreDate(jsDate);
+				period = parseInt($(".subjectEditChoice:checked").val().substr(13));
+
+				if(dhw[date] == undefined) {
+					dhw[date] = {};
+				}
+
+				if(dhw[date][period] == undefined) {
+					dhw[date][period] = [];
+				}
+
+				dhw[date][period].push({name: $("#taskEditInput").val(), details: $("#detailEditInput").val()});
+
+				l.dateHW = JSON.stringify(dhw);	
+
+				$.mobile.changePage("#hw", {transition: "pop", reverse: true});
 			}
 
 			$(document).bind('pageshow', function(e) {
@@ -166,12 +469,16 @@
 				checkDayValidity();
 				updateTitle();
 				id = e.target.id;
-				console.log("Page pre-shown with target ID of "+id);
+				//console.log("Page pre-shown with target ID of "+id);
 
 				if(id == "goto") {
 					d = new Date;
 					d.setTime(d.getTime()+86400000*day);
 					$('#gotoDateBox').val(twoDigits(d.getDate())+"/"+twoDigits(d.getMonth()+1)+"/"+d.getFullYear());
+				}
+
+				if(id == "hw") {
+					updateHWPage();
 				}
 
 				if(id == "addhw") {
@@ -183,49 +490,13 @@
 				}
 
 				if(id == "pg1" || id == "pg2") {
-					d = new Date;
-					d.setTime(d.getTime()+86400000*day);
-					var storeDate = genStoreDate(d);
-					
-					var html = "";
-					html += "<h2>"+storeDate+":</h2>";
-
-					todayClasses = JSON.parse(l.dateClasses)[storeDate];
-					todayHW = JSON.parse(l.dateHW)[storeDate];
-					//console.log("Today's Homework: "+todayHW);
-
-					if(todayClasses != undefined) {
-						$(template).each(function(){
-							if(this.type == "class") {
-								html += '<div class="ui-body ui-body-c ttItem">';
-								html += '<h2 class="subjectTitle">'+todayClasses[this.period].name+'</h2>';
-								html += '<h3 class="subjectTime">Period '+this.period+'</h3>';
-								html += '<h3 class="currentSubject">Current Subject</h3>';
-								if(todayHW != undefined) {
-									if (todayHW[this.period] != undefined) {
-										html += '<ul>';
-											$(todayHW[this.period]).each(function() {
-												html += '<li>'+this.name+'</li>';
-											})
-										html += '</ul>';
-									}
-								}
-								html += '</div>';
-							} else if(this.type == "break") {
-								html += "<p><i>"+this.name+"</i></p>";
-							}
-						});
-
-						$("#"+id).find(".classList").html(html);
-					} else {
-						$("#"+id).find(".classList").html("<p>No classes today!</p>");
-					}				
+					updateTTPage();
 				}
 			});
 
 			$(document).bind('pageinit', function(e) {
 				id = e.target.id;
-				console.log("Page initiated with target ID of "+id);
+				//console.log("Page initiated with target ID of "+id);
 
 				if(firstInit) {
 					if(!Modernizr.touch) {
@@ -250,7 +521,55 @@
 						}
 					});
 
-					//console.log("pageinit");
+					$("#hwEditDateBox").bind("datebox", function(e,p){
+						if(p.method === "set") {
+							updateEditHWSubjects();
+						}
+					});
+
+					$(".hwListItem").live("click", function() {
+						noEditHW();
+
+						dhw = JSON.parse(l.dateHW);
+						dcl = JSON.parse(l.dateClasses);
+						
+						date = $(this).data("date");
+						period = $(this).data("period");
+						num = $(this).data("num");
+
+						$("#hwDataStore").data("date", date);
+						$("#hwDataStore").data("period", period);
+						$("#hwDataStore").data("num", num);
+						
+						jsDate = dateFromStore(date);
+						info = dhw[date][period][num];
+
+						$("#hwDName").text(info["name"]+":");
+						$("#hwDSubject").html("<b>Subject:</b> "+dcl[date][period]["name"]);
+						$("#hwDDue").html("<b>Due Date:</b> "+jsDate.getDate()+"<sup>"+supertexts[jsDate.getDate()]+"</sup> "+fullMonths[jsDate.getMonth()]);
+						$("#hwDDesc").html(info["details"]);
+
+						if(info["details"] != "" && info["details"] != " ") {
+							$("#hwDDesc").show();
+						} else {
+							$("#hwDDesc").hide();
+						}
+					});
+
+					$("#hwDelButton").click(function() {
+						delHW();
+					});
+
+					$("#hwEditButton").click(function() {
+						editHW();
+					});
+
+					$(".hwSortBtn").click(function () {
+						if($(this).attr("id") == $(".hwSortBtn.ui-btn-active").attr("id")) {
+							setTimeout("updateHWPage()", 500);
+						}
+						updateHWPage();
+					});
 
 					firstInit = false;
 				}
@@ -266,18 +585,8 @@
 			Y8b  d8 db   8D db   8D 
 			 `Y88P' `8888Y' `8888Y' 
 			                        -->
+
 		<style type="text/css">
-			/*
-			What is this for? It causes problems with inputs
-
-			* {
-			  -moz-user-select: -moz-none;
-			  -khtml-user-select: none;
-			  -webkit-user-select: none;
-			  -ms-user-select: none;
-			  user-select: none;
-			}*/
-
 			.no-blue .ui-btn-active {
 				border:1px solid #111;
 				background:#333;
@@ -306,12 +615,6 @@
 				background-image:linear-gradient(#555,#383838);
 			}
 
-			.ui-page {
-				-webkit-backface-visibility: hidden;
-				height: 100% !important;
-				/*overflow: hidden;*/
-			}
-
 			.input { outline: none; }
 
 			.nav-glyphish-example .ui-btn .ui-btn-inner { padding-top: 40px !important; }
@@ -334,22 +637,10 @@
 				color: #444;
 			}
 
-			.nowSubject .subjectTitle {
-				font-size: 32px;
-			}
-
-			.nowSubject .subjectTime {
-				display: none;
-			}
-
-			.currentSubject {
-				display: none;
-			}
-
 			.nowSubject .currentSubject {
 				display: block;
-				margin-top: 0px;
-				margin-bottom: 5px;	
+				margin-top: 0px !important;
+				margin-bottom: 5px !important;
 			}
 
 			.in, .out {
@@ -359,9 +650,18 @@
 			.ttItem {
 				margin-bottom: 10px;
 			}
+
+			#detailInput {
+				resize: none;
+			}
+
+			#hwEditSection {
+				display: none;
+			}
 		</style>
+
 	</head>
-	<body> 
+	<body>
 
 	<!--
 	db   db db   d8b   db   d8888b.  .d8b.   d888b  d88888b    db 
@@ -372,7 +672,7 @@
 	YP   YP  `8b8' `8d8'    88      YP   YP  Y888P  Y88888P    VP 
 	                                                              -->
 	<div data-role="page" id="pg1" data-theme="d">
-		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
 			<a href="#goto" data-icon="grid" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
 			<a href="#addhw" data-icon="plus" class="ui-btn-right">Homework</a>
@@ -409,7 +709,7 @@
  																																			-->
 		                                        
 	<div data-role="page" id="pg2" data-theme="d">
-		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
 			<a href="#goto" data-icon="grid" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
 			<a href="#addhw" data-icon="plus" class="ui-btn-right">Homework</a>
@@ -446,7 +746,7 @@
 		Y88888P  `Y88P'   Y888P  Y888888P VP   V8P 
 		                                            -->
 	<div data-role="page" id="login" data-theme="d">
-		<div data-role="header" data-position="fixed" data-tap-toggle="false">
+		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false">
 			<h1>hDub Login</h1>
 		</div>
 
@@ -476,32 +776,20 @@
 													 																		-->
 	<div data-role="page" id="hw" data-theme="d">
 
-		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
 			<h1>Homework</h1>
+			<a href="#addhw" data-icon="plus" class="ui-btn-right">Homework</a>
 			<div data-role="navbar">
 				<ul>
-					<li><a href="#"  class="ui-btn-active ui-state-persist">Sort by Date</a></li>
-					<li><a href="#">Sort by Class</a></li>
+					<li><a href="#" id="dateSortBtn" class="ui-btn-active ui-state-persist hwSortBtn">Sort by Date</a></li>
+					<li><a href="#" class="hwSortBtn" id="classSortBtn">Sort by Class</a></li>
 				</ul>
 			</div>
 		</div>
 
 		<div data-role="content" data-theme="d">	
-			<ul data-role="listview" data-divider-theme="c">
-				<li data-role="list-divider">Today <span class="ui-li-count">2</span></li>
-				<li><a href="#hwdetail">
-						<h3>Homework Item</h3>
-						<p>Class</p>
-				</a></li>
-				<li><a href="#hwdetail">
-						<h3>Homework Item</h3>
-						<p>Class</p>
-				</a></li>
-				<li data-role="list-divider">Tomorrow <span class="ui-li-count">1</span></li>
-				<li><a href="#hwdetail">
-						<h3>Homework Item</h3>
-						<p>Class</p>
-				</a></li>
+			<ul data-role="listview" data-divider-theme="c" id="hwList">
+				<p>Error loading data</p>
 			</ul>
 		</div>
 		
@@ -526,14 +814,14 @@
 																																				-->
 
 	<div data-role="page" id="settings" data-theme="d">
-		<div data-role="header" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
 			<h1>Homework</h1>
 		</div>
 
 		<div data-role="content" data-theme="d">	
 			<h2>Settings</h2>
 			<p>DOES HYDRA EVEN WORK!?!</p>		
-			<p><a href="#login"data-role="button" data-transition="pop">Login</a></p>
+			<p><a href="#login" data-role="button" data-transition="pop">Login</a></p>
 			<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
 		</div>
 		
@@ -558,25 +846,15 @@
 																			 -->
 
 	<div data-role="dialog" id="goto">
-		<div data-role="header" data-theme="d">
+		<div data-role="header" data-theme="a">
 			<h1>Goto Date</h1>
 		</div>
 
 		<div data-role="content" data-theme="c">
 			<p>Click in the box below to select a date to naviage to:</p>
 			<label for="gotoDateBox" class="ui-hidden-accessible">Goto Date</label>
-			<input name="gotoDateBox" id="gotoDateBox" type="date" data-role="datebox" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": true, "blackDays": [0,6]}'>
+			<input name="gotoDateBox" id="gotoDateBox" type="date" data-role="datebox" min="2012-01-01" max="2012-12-31" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": false, "blackDays": [0,6]}'>
 			<p><a href="#pg1" id="gotoButton" data-rel="back" data-role="button" data-inline="true" data-icon="arrow-r" data-theme="b">Go</a></p>
-		</div>
-
-		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
-			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
-			<ul>
-				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist email">Timetable</a></li>
-				<li><a href="#hw" class="coffee" data-icon="custom" data-transition="none">Homework</a></li>
-				<li><a href="#settings" class="skull" data-icon="custom" data-transition="none">Settings</a></li>
-			</ul>
-			</div>
 		</div>
 	</div>
 
@@ -590,44 +868,119 @@
 																											-->
 	<div data-role="dialog" id="addhw">
 
-		<div data-role="header" data-theme="d">
+		<div data-role="header" data-theme="a">
 			<h1>Add Homework</h1>
 		</div>
 
 		<div data-role="content" data-theme="c">	
-			<form action="#hw" method="post">
+			<form action="javascript:addHomework()" method="post" id="hwForm">
 				<div data-role="fieldcontain">
-	         <label for="hwDateBox">Due Date:</label>
-	         <input name="hwDateBox" id="hwDateBox" type="date" data-role="datebox" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": true, "blackDays": [0,6]}'>
+					 <label for="hwDateBox">Due Date:</label>
+					 <input name="hwDateBox" id="hwDateBox" type="date" data-role="datebox" min="2012-01-01" max="2012-12-31" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": false, "blackDays": [0,6]}'>
 				</div>
+
 				<div data-role="fieldcontain" id="subjectSelect">
-			    <fieldset data-role="controlgroup">
-			    	<legend>Subject:</legend>
-	         	<label for="subject-1" id="subjectlabel-1">Error Loading Data</label>
-	         	<input type="radio" name="subjectPicker" id="subject-1" value="subject-1" checked="checked" />
-	         	<label for="subject-2" id="subjectlabel-2">Error Loading Data</label>
-	         	<input type="radio" name="subjectPicker" id="subject-2" value="subject-2"  />
-	         	<label for="subject-3" id="subjectlabel-3">Error Loading Data</label>
-	         	<input type="radio" name="subjectPicker" id="subject-3" value="subject-3"  />
-	         	<label for="subject-4" id="subjectlabel-4">Error Loading Data</label>
-	         	<input type="radio" name="subjectPicker" id="subject-4" value="subject-4"  />
-	         	<label for="subject-5" id="subjectlabel-5">Error Loading Data</label>
-	         	<input type="radio" name="subjectPicker" id="subject-5" value="subject-5"  />
-	         	<label for="subject-6" id="subjectlabel-6">Error Loading Data</label>
-	         	<input type="radio" name="subjectPicker" id="subject-6" value="subject-6"  />
-			    </fieldset>
+					<fieldset data-role="controlgroup">
+						<legend>Subject:</legend>
+					 	<label for="subject-1" id="subjectlabel-1">Error Loading Data</label>
+					 	<input type="radio" name="subjectPicker" class="subjectChoice" id="subject-1" value="subject-1" checked="checked" />
+					 	<label for="subject-2" id="subjectlabel-2">Error Loading Data</label>
+					 	<input type="radio" name="subjectPicker" class="subjectChoice" id="subject-2" value="subject-2" />
+					 	<label for="subject-3" id="subjectlabel-3">Error Loading Data</label>
+					 	<input type="radio" name="subjectPicker" class="subjectChoice" id="subject-3" value="subject-3" />
+					 	<label for="subject-4" id="subjectlabel-4">Error Loading Data</label>
+					 	<input type="radio" name="subjectPicker" class="subjectChoice" id="subject-4" value="subject-4" />
+					 	<label for="subject-5" id="subjectlabel-5">Error Loading Data</label>
+					 	<input type="radio" name="subjectPicker" class="subjectChoice" id="subject-5" value="subject-5" />
+					 	<label for="subject-6" id="subjectlabel-6">Error Loading Data</label>
+					 	<input type="radio" name="subjectPicker" class="subjectChoice" id="subject-6" value="subject-6" />
+					</fieldset>
 				</div>
+
 				<p id="noSubjects">This day has no classes. Please select another date.</p>
+
+				<div data-role="fieldcontain">
+					<label for="taskInput">Task Name:</label>
+					<input type="text" name="taskInput" id="taskInput" value=""	/>
+				</div>
+
+				<div data-role="fieldcontain">
+					<label for="detailInput">Extra Details: <small>(optional)</small></label>
+					<textarea cols="40" rows="8" name="detailInput" id="detailInput"></textarea>
+				</div>
+				
+				<button type="submit" id="hwSubmit" data-theme="b">Save</button>
 			</form>
 		</div>
-		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="c" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
-			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
-			<ul>
-				<li><a href="#pg1" class="email" data-icon="custom" data-transition="none">Timetable</a></li>
-				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist coffee">Homework</a></li>
-				<li><a href="#settings" class="skull" data-icon="custom" data-transition="none">Settings</a></li>
-			</ul>
+	</div>
+
+	<!--
+				db   db db   d8b   db   d8888b. d88888b d888888b  .d8b.  d888888b db      
+				88   88 88   I8I   88   88  `8D 88'     `~~88~~' d8' `8b   `88'   88      
+				88ooo88 88   I8I   88   88   88 88ooooo    88    88ooo88    88    88      
+				88~~~88 Y8   I8I   88   88   88 88~~~~~    88    88~~~88    88    88      
+				88   88 `8b d8'8b d8'   88  .8D 88.        88    88   88   .88.   88booo. 
+				YP   YP  `8b8' `8d8'    Y8888D' Y88888P    YP    YP   YP Y888888P Y88888P 
+																																									-->
+	<div data-role="dialog" id="hwdetail">
+		<div data-role="header" data-theme="a">
+			<h1 id="hwDataStore">Homework Detail</h1>
+		</div>
+		<div data-role="content">
+			<div id="hwDisplaySection">
+				<h2 id="hwDName">Eat Some Chocolate</h2>
+				<p id="hwDSubject">Subject: Chocolate Eating</p>
+				<p id="hwDDue">Due: 42<sup>nd</sup> Awesometober 1999</p>
+				<p id="hwDDesc">This is the only homework in this class that we've had all year...</p>
+				<div class="ui-grid-b">
+					<div class="ui-block-a"><a href="#" id="hwEditButton" data-role="button" data-theme="c">Edit</a></div>
+					<div class="ui-block-b"><a href="#" id="hwDelButton"  data-role="button" data-theme="c">Delete</a></div>
+					<div class="ui-block-c"><a href="#" id="hwDoneButton"  data-rel="back" data-role="button" data-theme="b">Done</a></div>
+				</div>
+			</div>
+			<div id="hwEditSection">
+				<h2>Edit Homework:</h2>
+				<form action="javascript:saveHWEdits()" method="post" id="hwEditForm">
+					<div data-role="fieldcontain">
+						 <label for="hwEditDateBox">Due Date:</label>
+						 <input name="hwEditDateBox" id="hwEditDateBox" type="date" data-role="datebox" min="2012-01-01" max="2012-12-31" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": false, "blackDays": [0,6]}'>
+					</div>
+
+					<div data-role="fieldcontain" id="subjectEditSelect">
+						<fieldset data-role="controlgroup">
+							<legend>Subject:</legend>
+						 	<label for="subject-edit-1" id="subjectlabel-edit-1">Error Loading Data</label>
+						 	<input type="radio" name="editSubjectPicker" class="subjectEditChoice" id="subject-edit-1" value="subject-edit-1" />
+						 	<label for="subject-edit-2" id="subjectlabel-edit-2">Error Loading Data</label>
+						 	<input type="radio" name="editSubjectPicker" class="subjectEditChoice" id="subject-edit-2" value="subject-edit-2" />
+						 	<label for="subject-edit-3" id="subjectlabel-edit-3">Error Loading Data</label>
+						 	<input type="radio" name="editSubjectPicker" class="subjectEditChoice" id="subject-edit-3" value="subject-edit-3" />
+						 	<label for="subject-edit-4" id="subjectlabel-edit-4">Error Loading Data</label>
+						 	<input type="radio" name="editSubjectPicker" class="subjectEditChoice" id="subject-edit-4" value="subject-edit-4" />
+						 	<label for="subject-edit-5" id="subjectlabel-edit-5">Error Loading Data</label>
+						 	<input type="radio" name="editSubjectPicker" class="subjectEditChoice" id="subject-edit-5" value="subject-edit-5" />
+						 	<label for="subject-edit-6" id="subjectlabel-edit-6">Error Loading Data</label>
+						 	<input type="radio" name="editSubjectPicker" class="subjectEditChoice" id="subject-edit-6" value="subject-edit-6" />
+						</fieldset>
+					</div>
+
+					<p id="noEditSubjects">This day has no classes. Please select another date.</p>
+
+					<div data-role="fieldcontain">
+						<label for="taskEditInput">Task Name:</label>
+						<input type="text" name="taskEditInput" id="taskEditInput" value=""	/>
+					</div>
+
+					<div data-role="fieldcontain">
+						<label for="detailEditInput">Extra Details: <small>(optional)</small></label>
+						<textarea cols="40" rows="8" name="detailEditInput" id="detailEditInput"></textarea>
+					</div>
+					
+					<div class="ui-grid-a">
+						<div class="ui-block-a"><a href="#" id="hwEditCancelButton" data-rel="back" data-role="button" data-theme="c">Cancel</a></div>
+						<div class="ui-block-b"><button type="submit" id="hwEditSubmit" data-theme="b">Save</button></div>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
