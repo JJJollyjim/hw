@@ -5,7 +5,7 @@
 <!DOCTYPE html> 
 <html>
 	<head>
-		<script src="http://192.168.2.14:8080/target/target-script-min.js#anonymous"></script>
+		<script src="http://192.168.2.50:8080/target/target-script-min.js#anonymous"></script>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"> 
 
@@ -21,6 +21,7 @@
 		<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/i18n/jquery.mobile.datebox.i18n.en_US.utf8.js"></script>
 		<script src="modernizr.js"></script>
 		<script>
+
 			/*
 			
 				   d88b  .d8b.  db    db  .d8b.  .d8888.  .o88b. d8888b. d888888b d8888b. d888888b 
@@ -44,13 +45,17 @@
 			var dayHasSubjects;
 			var editDayHasSubjects;
 			var firstCDV = true;
+			var setPD = 0;
 
 			if(l.loggedIn != 1) {
 				//console.log("LOGIN");
 			}
 			
-			//l.dateHW = '{}';
-			l.dateClasses = '{"2012-12-14" : {"1" : {"name" : "Maths"}, "2" : {"name" : "Science"}, "3" : {"name" : "Art"}, "4" : {"name" : "French"}, "5" : {"name" : "English"}, "6" : {"name" : "Technology"} } , "2012-12-17" : {"1" : {"name" : "English"}, "2" : {"name" : "Music"}, "3" : {"name" : "French"}, "4" : {"name" : "Histroy"}, "5" : {"name" : "Technology"}, "6" : {"name" : "PE"} } , "2012-12-13" : {"1" : {"name" : "Turtle"}, "2" : {"name" : "Turtle"}, "3" : {"name" : "Turtle"}, "4" : {"name" : "Turtle"}, "5" : {"name" : "Turtle"}, "6" : {"name" : "Turtle"} } }';
+			if(l.dateHW == undefined) {
+				l.dateHW = "{}";
+			}
+			
+			l.dateClasses = '{"2012-12-14" : {"1" : {"name" : "Maths"}, "2" : {"name" : "Science"}, "3" : {"name" : "Art"}, "4" : {"name" : "French"}, "5" : {"name" : "English"}, "6" : {"name" : "Technology"} } , "2012-12-17" : {"1" : {"name" : "English"}, "2" : {"name" : "Music"}, "3" : {"name" : "French"}, "4" : {"name" : "Histroy"}, "5" : {"name" : "Technology"}, "6" : {"name" : "PE"} } , "2012-12-13" : {"1" : {"name" : "Turtle"}, "2" : {"name" : "Turtle"}, "3" : {"name" : "Turtle"}, "4" : {"name" : "Turtle"}, "5" : {"name" : "Turtle"}, "6" : {"name" : "Turtle"} } , "2012-12-24" : {"1" : {"name" : "Tortise"}, "2" : {"name" : "Tortise"}, "3" : {"name" : "Tortise"}, "4" : {"name" : "Tortise"}, "5" : {"name" : "Tortise"}, "6" : {"name" : "Tortise"} } }';
 
 			var days = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"};
 			var supertexts = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th", 7: "th", 8: "th", 9: "th", 10: "th", 11: "th", 12: "th", 13: "th", 14: "th", 15: "th", 16: "th", 17: "th", 18: "th", 19: "th", 20: "th", 21: "st", 22: "nd", 23: "rd", 24: "th", 25: "th", 26: "th", 27: "th", 28: "th", 29: "th", 30: "th", 31: "st"};
@@ -194,6 +199,10 @@
 						$("#subjectlabel-"+i).find(".ui-btn-text").text(classes[i].name);
 						$("#subject-"+i).checkboxradio("refresh");
 					}
+					if(setPD != 0) {
+						$("#subject-"+setPD).attr("checked", true).checkboxradio("refresh");
+						$("#subject-1").checkboxradio("refresh");
+					}
 				} else {
 					$("#noSubjects").show();
 					$("#subjectSelect").hide();
@@ -202,6 +211,61 @@
 					$("#hwSubmit").addClass("ui-disabled");
 					dayHasSubjects = false;
 				}
+			}
+
+			function updateClassPage(clicked) {
+				dcl = JSON.parse(l.dateClasses);
+				dhw = JSON.parse(l.dateHW);
+				date = $(clicked).data("date");
+				period = $(clicked).data("period");
+				jsDate = dateFromStore(date);
+				info = dcl[date][period];
+
+				$("#classDataStore").data("date", date);
+				$("#classDataStore").data("period", period);
+
+				$("#className").text(info["name"]+":");
+				$("#classDate").html("<b>Date:</b> "+jsDate.getDate()+"<sup>"+supertexts[jsDate.getDate()]+"</sup> "+fullMonths[jsDate.getMonth()]);
+				$("#classPeriod").html("<b>Period:</b> "+period);
+				if(dhw[date] != undefined) {
+					if(dhw[date][period] != undefined) {
+						if(dhw[date][period].length > 0) {
+							html = "<h4>Homework:</h4>";
+							
+							num = 0;
+							$(dhw[date][period]).each(function() {
+								html += '<div class="ui-body ui-body-d classHWItem" data-date="'+date+'" data-period="'+period+'"" data-num="'+num+'">';
+
+								html += '<h3>'+dhw[date][period][num]["name"]+':</h3>';
+								if(dhw[date][period][num]["details"] != "" && dhw[date][period][num]["details"] != " ") {
+									html += '<p>'+dhw[date][period][num]["details"]+'</p>';
+								}
+
+								html += '<div class="ui-grid-b">';
+									html += '<div class="ui-block-a switchaa"><a href="#" class="classHWButton classHWEditButton" data-role="button" data-theme="c">Edit</a></div>';
+									html += '<div class="ui-block-b switchab"><a href="#" class="classHWButton classHWDelButton" data-role="button" data-theme="c">Delete</a></div>';
+									html += '<div class="ui-block-c switchac"><a href="#" class="classHWButton classHWViewButton" data-role="button" data-theme="c">View</a></div>';
+								html += '</div>'
+
+								html += '</div><br/>';
+								num++;
+							});
+
+							$("#classHW").html(html);
+							$(".classHWButton").button();
+						} else {
+							$("#classHW").html("<b>Homework:</b> No homework");
+						}
+					} else {
+						$("#classHW").html("<b>Homework:</b> No homework");
+					}
+				} else {
+					$("#classHW").html("<b>Homework:</b> No homework");
+				}
+
+				setPD = period;
+
+				$.mobile.changePage("#classdetail", {transition: "pop"});
 			}
 
 			function updateEditHWSubjects() {
@@ -354,9 +418,9 @@
 							isNow = (now>=pdTimes[1][this.period][0] && now < pdTimes[1][this.period][1]);
 
 							if(isToday && isNow) {
-								html += '<div class="ui-body ui-body-b nowSubject ttItem">';
+								html += '<div class="ui-body ui-body-b nowSubject ttItem" data-date="'+storeDate+'" data-period="'+this.period+'">';
 							} else {
-								html += '<div class="ui-body ui-body-c ttItem">';
+								html += '<div class="ui-body ui-body-c ttItem" data-date="'+storeDate+'" data-period="'+this.period+'">';
 							}
 
 							html += '<h3 class="subjectTitle">'+todayClasses[this.period].name+'</h3>';
@@ -399,6 +463,19 @@
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
 					$.mobile.changePage("#hw", {reverse: true});
+				}
+			}
+
+			function delClassHW(linkParent) {
+				dhw = JSON.parse(l.dateHW);
+				date = linkParent.data("date");
+				period = linkParent.data("period");
+				num = linkParent.data("num");
+
+				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
+					dhw[date][period].splice(num, 1);
+					l.dateHW = JSON.stringify(dhw);
+					updateClassPage();
 				}
 			}
 
@@ -556,6 +633,19 @@
 						}
 					});
 
+					$(".ttItem").live("click", function() {
+						updateClassPage(this);
+					});
+
+					$(".classHWEditButton").live("click", function() {
+						console.log("edit");
+					});
+
+					$(".classHWDelButton").live("click", function() {
+						console.log("delete");
+						delClassHW($(this).parent().parent().parent());
+					});
+
 					$("#hwDelButton").click(function() {
 						delHW();
 					});
@@ -564,11 +654,19 @@
 						editHW();
 					});
 
+					$("#hwEditCancelButton").click(function() {
+						noEditHW();
+					});
+
 					$(".hwSortBtn").click(function () {
 						if($(this).attr("id") == $(".hwSortBtn.ui-btn-active").attr("id")) {
 							setTimeout("updateHWPage()", 500);
 						}
 						updateHWPage();
+					});
+
+					$(window).resize(function() {
+						//console.log($(window).width());
 					});
 
 					firstInit = false;
@@ -933,9 +1031,9 @@
 				<p id="hwDDue">Due: 42<sup>nd</sup> Awesometober 1999</p>
 				<p id="hwDDesc">This is the only homework in this class that we've had all year...</p>
 				<div class="ui-grid-b">
-					<div class="ui-block-a"><a href="#" id="hwEditButton" data-role="button" data-theme="c">Edit</a></div>
-					<div class="ui-block-b"><a href="#" id="hwDelButton"  data-role="button" data-theme="c">Delete</a></div>
-					<div class="ui-block-c"><a href="#" id="hwDoneButton"  data-rel="back" data-role="button" data-theme="b">Done</a></div>
+					<div class="ui-block-a switchaa"><a href="#" id="hwEditButton" data-role="button" data-theme="c">Edit</a></div>
+					<div class="ui-block-b switchab"><a href="#" id="hwDelButton"  data-role="button" data-theme="c">Delete</a></div>
+					<div class="ui-block-c switchac"><a href="#" id="hwDoneButton"  data-rel="back" data-role="button" data-theme="b">Done</a></div>
 				</div>
 			</div>
 			<div id="hwEditSection">
@@ -977,10 +1075,35 @@
 					</div>
 					
 					<div class="ui-grid-a">
-						<div class="ui-block-a"><a href="#" id="hwEditCancelButton" data-rel="back" data-role="button" data-theme="c">Cancel</a></div>
+						<div class="ui-block-a"><a href="#" id="hwEditCancelButton" data-role="button" data-theme="c">Cancel</a></div>
 						<div class="ui-block-b"><button type="submit" id="hwEditSubmit" data-theme="b">Save</button></div>
 					</div>
 				</form>
+			</div>
+		</div>
+	</div>
+
+	<!--
+			 .o88b. db       .d8b.  .d8888. .d8888.   d8888b. d88888b d888888b  .d8b.  d888888b db      
+			d8P  Y8 88      d8' `8b 88'  YP 88'  YP   88  `8D 88'     `~~88~~' d8' `8b   `88'   88      
+			8P      88      88ooo88 `8bo.   `8bo.     88   88 88ooooo    88    88ooo88    88    88      
+			8b      88      88~~~88   `Y8b.   `Y8b.   88   88 88~~~~~    88    88~~~88    88    88      
+			Y8b  d8 88booo. 88   88 db   8D db   8D   88  .8D 88.        88    88   88   .88.   88booo. 
+			 `Y88P' Y88888P YP   YP `8888Y' `8888Y'   Y8888D' Y88888P    YP    YP   YP Y888888P Y88888P 
+			                                                                                            -->
+	<div data-role="dialog" id="classdetail">
+		<div data-role="header" data-theme="a">
+			<h1 id="classDataStore">Class Detail</h1>
+		</div>
+		<div data-role="content">
+			<h2 id="className">Error</h2>
+			<p id="classDate">Error</p>
+			<p id="classPeriod">Error</p>
+			<p id="classHW">Error</p>
+			<div class="ui-grid-b">
+				<div class="ui-block-a switchaa"><a href="#addhw" id="classEditButton" data-icon="plus" data-role="button" data-theme="c">HW</a></div>
+				<div class="ui-block-b switchab"><a href="#" id="classDelButton"  data-role="button" data-theme="c">Delete</a></div>
+				<div class="ui-block-c switchac"><a href="#" id="classDoneButton"  data-rel="back" data-role="button" data-theme="b">Done</a></div>
 			</div>
 		</div>
 	</div>

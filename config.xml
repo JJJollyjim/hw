@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+	<widget xmlns = "http://www.w3.org/ns/widgets"
+		xmlns:gap = "http://phonegap.com/ns/1.0"
+		id = "com.hdubapp.app"
+		versionCode="1"
+		version = "1.0.0">
+
+	<name>hDub</name>
+
+	<description>
+		An Application for students of WGC to view their timetable information and record details of homework tasks
+	</description>
+
+	<author href="https://www.kwiius.com" email="jamie@kwiius.com">
+		Jamie McClymont, Kwiius
+	</author>
+
+	<preference name="phonegap-version" value="2.2.0" />
+	<preference name="orientation" value="portrait" />
+	<preference name="target-device" value="universal" />
+	<preference name="fullscreen" value="false" />
+	<preference name="webviewbounce" value="false" />
+	<preference name="prerendered-icon" value="true" />
+	<preference name="stay-in-webview" value="false" />
+	<preference name="ios-statusbarstyle" value="default" />
+	<preference name="detect-data-types" value="false" />
+	<preference name="exit-on-suspend" value="false" />
+	<preference name="show-splash-screen-spinner" value="true" />
+	<preference name="auto-hide-splash-screen" value="true" />
+
+	<icon src="icons/IconiPhone.png" gap:platform="ios" width="57" height="57" />
+	<icon src="icons/IconiPad.png" gap:platform="ios" width="72" height="72" />
+	<icon src="icons/IconiPhoneR.png" gap:platform="ios" width="114" height="114" />
+	<icon src="icons/IconiPadR.png" gap:platform="ios" width="144" height="144" />
+
+	<icon src="icons/IconAldpi.png" gap:platform="android" gap:density="ldpi" width="36" height="36" />
+	<icon src="icons/IconAmdpi.png" gap:platform="android" gap:density="mdpi" width="48" height="48" />
+	<icon src="icons/IconAhdpi.png" gap:platform="android" gap:density="hdpi" width="72" height="72" />
+	<icon src="icons/IconAxhdpi.png" gap:platform="android" gap:density="xhdpi" width="96" height="96" />
+</widget>
