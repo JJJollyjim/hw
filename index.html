@@ -16,11 +16,13 @@
 		<link rel="stylesheet" href="styles/theme.css" />
   	<link rel="stylesheet" href="styles/jquery.mobile.structure-1.2.0.min.css" /> 
 		<link rel="stylesheet" href="styles/jqm-datebox.min.css" /> 
+		<link rel="stylesheet" href="styles/jqm-toast.min.css" /> 
 
 		<script src="scripts/jquery-1.8.2.min.js"></script> 
   	<script src="scripts/jquery.mobile-1.2.0.min.js"></script> 
 		<script src="scripts/jqm-datebox.core.min.js"></script>
 		<script src="scripts/jqm-datebox.mode.calbox.min.js"></script>
+		<script src="scripts/jqm-toast.min.js"></script>
 		<script src="scripts/jquery.mobile.datebox.i18n.en_US.utf8.js"></script>
 		<script src="scripts/modernizr.js"></script>
 		<script>
@@ -58,6 +60,10 @@
 				l.dateHW = "{}";
 			}
 			
+			if(l.dateClasses == undefined) {
+				l.dateClasses = "{}";
+			}
+			
 			//l.dateClasses = '{}';
 
 			var days = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"};
@@ -66,6 +72,35 @@
 			var fullMonths = {0: "Janurary", 1: "Feburary", 2: "March", 3: "April", 4: "May", 5: "June", 6: "July", 7: "August", 8: "September", 9: "October", 10: "November", 11: "December"};
 			var template = [{"type":"class", "period":"1"}, {"type":"class", "period":"2"}, {"type":"break", "name":"Form Time & Interval"}, {"type":"class", "period":"3"}, {"type":"class", "period":"4"}, {"type":"break", "name":"Lunchtime"}, {"type":"class", "period":"5"}, {"type":"class", "period":"6"}];
 			var pdTimes = {1: {1: [525,575], 2: [575,625], 3: [660,710], 4: [710,760], 5: [820,870], 6: [870,920]}}
+
+			function checkCon() {
+				return $.ajax({
+					url: "http://hdubapp.com/ServerSideInDev/hDub.txt",
+					type: "GET",
+					dataType: "text",
+					timeout: 3000
+				});
+			}
+
+			function conToast() {
+				req = checkCon();
+				req.error(function() {
+					showToast("No Connection");
+				});
+				req.success(function(d) {
+					showToast("Connected");
+					console.log(d);
+				});
+				return req;
+			}
+
+			function showToast(text) {
+				$("#toaster").html(text).toast("show");
+			}
+
+			function CCOutput() {
+
+			}
 
 			function genDate(d) {
 				n = new Date;
@@ -579,6 +614,8 @@
 				//console.log("Page initiated with target ID of "+id);
 
 				if(firstInit) {
+					$("#toaster").toast();
+
 					if(!Modernizr.touch) {
 						$(".np-page").show();
 					} else {
@@ -763,6 +800,7 @@
 
 	</head>
 	<body>
+	<div id="toaster" data-role="toast">Unknown Error</div>
 
 	<!--
 	db   db db   d8b   db   d8888b.  .d8b.   d888b  d88888b    db 
