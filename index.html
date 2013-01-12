@@ -51,6 +51,7 @@
 			var editDayHasSubjects;
 			var firstCDV = true;
 			var setPD = 0;
+			var iscon;
 
 			if(l.loggedIn != 1) {
 				//console.log("LOGIN");
@@ -64,6 +65,14 @@
 				l.dateClasses = "{}";
 			}
 			
+			if(l.sid == undefined) {
+				l.sid = 0;
+			}
+			
+			if(l.pass == undefined) {
+				l.pass = 0;
+			}
+			
 			//l.dateClasses = '{}';
 
 			var days = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"};
@@ -73,12 +82,49 @@
 			var template = [{"type":"class", "period":"1"}, {"type":"class", "period":"2"}, {"type":"break", "name":"Form Time & Interval"}, {"type":"class", "period":"3"}, {"type":"class", "period":"4"}, {"type":"break", "name":"Lunchtime"}, {"type":"class", "period":"5"}, {"type":"class", "period":"6"}];
 			var pdTimes = {1: {1: [525,575], 2: [575,625], 3: [660,710], 4: [710,760], 5: [820,870], 6: [870,920]}}
 
+			function isJson(str) {
+		    try {
+		      JSON.parse(str);
+		    } catch (e) {
+		      return false;
+		    }
+		    return true;
+			}
+
 			function checkCon() {
 				return $.ajax({
 					url: "http://hdubapp.com/ServerSideInDev/hDub.txt",
 					type: "GET",
 					dataType: "text",
-					timeout: 3000
+					timeout: 5000
+				});
+			}
+
+			function fetchClassList() {
+				$.ajax({
+					url: "http://hdubapp.com/ServerSideInDev/genClassList.php",
+					type: "GET",
+					dataType: "text",
+					data: {sid: l.sid,
+								pass: l.pass},
+					timeout: 10000,
+					success: function(d) {
+						if(d == "Err1") {
+							showToast("Authentication error");
+						} else if (d == "Err2" || d == "Err3" || d == "Err4" || d == "Err6") {
+							showToast("Database access error");
+						} else if (d == "Err5" || d == "Err7") {
+							showToast("Data index error");
+						} else if (!isJson(d)) {
+							showToast("Timetable invalid");
+						} else {
+							showToast("Timetable downloaded");
+							l.dateClasses = d;
+						}
+					},
+					error: function() {
+						showToast("Error fetching timetable");
+					}
 				});
 			}
 
@@ -86,10 +132,22 @@
 				req = checkCon();
 				req.error(function() {
 					showToast("No Connection");
+					window.iscon = false;
+					$(document).trigger("conUpdate");
+					$(document).trigger("conFalse");
 				});
 				req.success(function(d) {
-					showToast("Connected");
-					console.log(d);
+					if(d == "holy Dump udder bucket") {
+						showToast("Connected");
+						window.iscon = true;
+						$(document).trigger("conUpdate");
+						$(document).trigger("conTrue");
+					} else {
+						showToast("No Connection: offline mode");
+						window.iscon = false;
+						$(document).trigger("conUpdate");
+						$(document).trigger("conFalse");
+					}
 				});
 				return req;
 			}
@@ -500,6 +558,7 @@
 				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
+					showToast("Item Deleted");
 					$.mobile.changePage("#hw", {reverse: true});
 				}
 			}
@@ -513,6 +572,7 @@
 				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
+					showToast("Item Deleted");
 					updateClassPage();
 				}
 			}
@@ -622,15 +682,15 @@
 						$(".np-page").hide();
 					}
 
-					$("#gotoButton").click(function() {
+					$("#gotoButton").on("vclick", function() {
 						genDay($("#gotoDateBox").datebox('getTheDate'));
 					});
 
 					$('body').bind('swiperight', function() { prvDay(); });
 					$('body').bind('swipeleft' , function() { nxtDay(); });
 
-					$(".prvDay").click(function(){ prvDay(); });
-					$(".nxtDay").click(function(){ nxtDay(); });
+					$(".prvDay").on("vclick", function(){ prvDay(); });
+					$(".nxtDay").on("vclick", function(){ nxtDay(); });
 
 					$("#hwDateBox").bind("datebox", function(e,p){
 						if(p.method === "set") {
@@ -644,7 +704,7 @@
 						}
 					});
 
-					$(".hwListItem").live("click", function() {
+					$(".hwListItem").live("vclick", function() {
 						noEditHW();
 
 						dhw = JSON.parse(l.dateHW);
@@ -673,32 +733,32 @@
 						}
 					});
 
-					$(".ttItem").live("click", function() {
+					$(".ttItem").live("vclick", function() {
 						updateClassPage(this);
 					});
 
-					$(".classHWEditButton").live("click", function() {
+					$(".classHWEditButton").live("vclick", function() {
 						console.log("edit");
 					});
 
-					$(".classHWDelButton").live("click", function() {
+					$(".classHWDelButton").live("vclick", function() {
 						console.log("delete");
 						delClassHW($(this).parent().parent().parent());
 					});
 
-					$("#hwDelButton").click(function() {
+					$("#hwDelButton").on("vclick", function() {
 						delHW();
 					});
 
-					$("#hwEditButton").click(function() {
+					$("#hwEditButton").on("vclick", function() {
 						editHW();
 					});
 
-					$("#hwEditCancelButton").click(function() {
+					$("#hwEditCancelButton").on("vclick", function() {
 						noEditHW();
 					});
 
-					$(".hwSortBtn").click(function () {
+					$(".hwSortBtn").on("vclick", function () {
 						if($(this).attr("id") == $(".hwSortBtn.ui-btn-active").attr("id")) {
 							setTimeout("updateHWPage()", 500);
 						}
