@@ -864,6 +864,7 @@
 
 				if(firstInit) {
 					setInterval('syncDown();', 10000);
+					syncDown();
 					dot = new Date;
 					console.warn("sfi", dot.getTime());
 					$.event.special.swipe.verticalDistanceThreshold = 50;
