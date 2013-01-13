@@ -52,6 +52,9 @@
 			var firstCDV = true;
 			var setPD = 0;
 			var iscon;
+			var hwOld = false;
+			var dd;
+			var td;
 
 			if(l.loggedIn != 1) {
 				//console.log("LOGIN");
@@ -233,7 +236,7 @@
 				n = resetHrs(n);
 				d = resetHrs(d);
 
-				day = d.getTime()/86400000+1 - n.getTime()/86400000;
+				day = d.getTime()/86400000 - n.getTime()/86400000;
 			}
 
 			function resetHrs(d) {
@@ -409,12 +412,14 @@
 					dhw[storeDate][classnum].push({name: $("#taskInput").val(), details: $("#detailInput").val()});
 
 					l.dateHW = JSON.stringify(dhw);
+					showToast("Saved");
 					$.mobile.changePage("#hw", {transition: "pop", reverse: true});
 					setTimeout(function() {
 						$("#taskInput").val("");
 						$("#detailInput").val("");
 					}, 300);
 				}
+				showToast("Not saved");
 			}
 
 			function updateHWPage() {
@@ -430,36 +435,82 @@
 				allhwcount = 0;
 				if($(".hwSortBtn.ui-btn-active").attr("id") == "dateSortBtn") {
 					for (key in dhw) {
-						dhtml = "";
-						hwcount = 0;
-						for (key2 in dhw[key]) {
-							for (key3 in dhw[key][key2]) {
-								dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+'><a href="#hwdetail" class="hwListItemLink">';
-								dhtml += '<h3>'+dhw[key][key2][key3]["name"]+'</h3>';
-								dhtml += '<p>'+dcl[key][key2]["name"]+' (Period '+key2+')</p>';
-								dhtml += '</a></li>';
-								hwcount++;
-								allhwcount++;
+						dd = resetHrs(dateFromStore(key));
+						td = resetHrs(new Date);
+						if(hwOld == false) {
+							if(dd >= td) {
+								dhtml = "";
+								hwcount = 0;
+								for (key2 in dhw[key]) {
+									for (key3 in dhw[key][key2]) {
+										dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+'><a href="#hwdetail" class="hwListItemLink">';
+										dhtml += '<h3>'+dhw[key][key2][key3]["name"]+'</h3>';
+										dhtml += '<p>'+dcl[key][key2]["name"]+' (Period '+key2+')</p>';
+										dhtml += '</a></li>';
+										hwcount++;
+										allhwcount++;
+									}
+								}
+
+								if(hwcount > 0) {
+									html += '<li data-role="list-divider">'+genDate(dateFromStore(key))+' <span class="ui-li-count">'+hwcount+'</span></li>';
+								}
+								html += dhtml;
+							}
+						} else if(hwOld == true) {
+							if(dd < td) {
+								dhtml = "";
+								hwcount = 0;
+								for (key2 in dhw[key]) {
+									for (key3 in dhw[key][key2]) {
+										dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+'><a href="#hwdetail" class="hwListItemLink">';
+										dhtml += '<h3>'+dhw[key][key2][key3]["name"]+'</h3>';
+										dhtml += '<p>'+dcl[key][key2]["name"]+' (Period '+key2+')</p>';
+										dhtml += '</a></li>';
+										hwcount++;
+										allhwcount++;
+									}
+								}
+
+								if(hwcount > 0) {
+									html += '<li data-role="list-divider">'+genDate(dateFromStore(key))+' <span class="ui-li-count">'+hwcount+'</span></li>';
+								}
+								html += dhtml;
 							}
 						}
-
-						if(hwcount > 0) {
-							html += '<li data-role="list-divider">'+genDate(dateFromStore(key))+' <span class="ui-li-count">'+hwcount+'</span></li>';
-						}
-						html += dhtml;
 					}
 				} else {
 					tempConstruct = [];
 					for (key in dhw) {
-						for (key2 in dhw[key]) {
-							for (key3 in dhw[key][key2]) {
-								className = dcl[key][key2]["name"];
-								if(tempConstruct[className] == undefined) {
-									tempConstruct[className] = [];
+						dd = resetHrs(dateFromStore(key));
+						td = resetHrs(new Date);
+						if(hwOld == false) {
+							if(dd >= td) {
+								for (key2 in dhw[key]) {
+									for (key3 in dhw[key][key2]) {
+										className = dcl[key][key2]["name"];
+										if(tempConstruct[className] == undefined) {
+											tempConstruct[className] = [];
+										}
+										tempConstruct[className].push({date:key, period:key2, num:key3});
+									}
 								}
-								tempConstruct[className].push({date:key, period:key2, num:key3});
+							}
+						} else if(hwOld == true) {
+							if(dd < td) {
+								for (key2 in dhw[key]) {
+									for (key3 in dhw[key][key2]) {
+										className = dcl[key][key2]["name"];
+										if(tempConstruct[className] == undefined) {
+											tempConstruct[className] = [];
+										}
+										tempConstruct[className].push({date:key, period:key2, num:key3});
+									}
+								}
 							}
 						}
+
+
 					}
 
 					for(key4 in tempConstruct) {
@@ -637,6 +688,8 @@
 				//console.log("Page shown with target ID of "+id);
 				if(id == "goto") {
 					$("#gotoDateBox").datebox("open");
+				} else if (id == "addhw") {
+					updateHWSubjects();
 				}
 			});
 
@@ -653,6 +706,9 @@
 				}
 
 				if(id == "hw") {
+					hwOld = false;
+					$("#hwOldBtn").show();
+					$("#hwNewBtn").hide();
 					updateHWPage();
 				}
 
@@ -674,6 +730,8 @@
 				//console.log("Page initiated with target ID of "+id);
 
 				if(firstInit) {
+					$.event.special.swipe.verticalDistanceThreshold = 50;
+
 					$("#toaster").toast();
 
 					if(!Modernizr.touch) {
@@ -758,11 +816,27 @@
 						noEditHW();
 					});
 
-					$(".hwSortBtn").on("vclick", function () {
+					$(".hwSortBtn").on("click", function () {
 						if($(this).attr("id") == $(".hwSortBtn.ui-btn-active").attr("id")) {
 							setTimeout("updateHWPage()", 500);
 						}
 						updateHWPage();
+					});
+
+					$("#hwOldBtn").on("click", function () {
+						hwOld = true;
+						updateHWPage();
+						showToast("Old");
+						$("#hwNewBtn").show();
+						$("#hwOldBtn").hide();
+					});
+
+					$("#hwNewBtn").on("click", function () {
+						hwOld = false;
+						updateHWPage();
+						showToast("New");
+						$("#hwOldBtn").show();
+						$("#hwNewBtn").hide();
 					});
 
 					$(window).resize(function() {
@@ -856,6 +930,10 @@
 			#hwEditSection {
 				display: none;
 			}
+
+			#hwNewBtn {
+				display: none;
+			}
 		</style>
 
 	</head>
@@ -874,7 +952,7 @@
 		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
 			<a href="#goto" data-icon="grid" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
-			<a href="#addhw" data-icon="plus" class="ui-btn-right">Homework</a>
+			<a href="#addhw" data-icon="plus" class="ui-btn-right">HW</a>
 			<div data-role="navbar" class="np-page no-blue">
 				<ul>
 					<li><a href="#" class="prvDay">Previous Day</a></li>
@@ -911,7 +989,7 @@
 		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
 			<a href="#goto" data-icon="grid" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
-			<a href="#addhw" data-icon="plus" class="ui-btn-right">Homework</a>
+			<a href="#addhw" data-icon="plus" class="ui-btn-right">HW</a>
 			<div data-role="navbar" class="np-page no-blue">
 				<ul>
 					<li><a href="#" class="prvDay">Previous Day</a></li>
@@ -976,8 +1054,10 @@
 	<div data-role="page" id="hw" data-theme="d">
 
 		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
+			<a href="#" class="ui-btn-left" id="hwOldBtn">Old</a>
+			<a href="#" class="ui-btn-left" id="hwNewBtn">New</a>
 			<h1>Homework</h1>
-			<a href="#addhw" data-icon="plus" class="ui-btn-right">Homework</a>
+			<a href="#addhw" data-icon="plus" class="ui-btn-right">HW</a>
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#" id="dateSortBtn" class="ui-btn-active ui-state-persist hwSortBtn">Sort by Date</a></li>
