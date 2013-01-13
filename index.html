@@ -139,11 +139,11 @@
 					dataType: "json",
 					data: {sid: l.sid,
 								pass: l.pass},
-					timeout: 20000,
+					timeout: 60000,
 					success: function(d) {
 						if(d.error != undefined) {
 							if(d.error == "Err1") {
-								//Already indexed
+								fetchClassList();
 							} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err5" || d.error == "Err6" || d.error == "Err10" || d.error == "Err11" || d.error == "Err12") {
 								showToast("Database index error");
 							} else if (d.error == "Err7" || d.error == "Err9" || d.error == "Err15") {
@@ -158,8 +158,9 @@
 							showToast("Index server error");
 						}
 					},
-					error: function() {
+					error: function(a,b,c) {
 						showToast("Error indexing timetable");
+						console.error(a,b,c);
 					}
 				});
 			}
