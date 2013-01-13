@@ -124,6 +124,7 @@
 						} else {
 							showToast("Timetable downloaded");
 							l.dateClasses = d;
+							$.mobile.changePage("#pg1");
 						}
 					},
 					error: function() {
@@ -770,6 +771,10 @@
 				if(id == "pg1" || id == "pg2") {
 					updateTTPage();
 				}
+
+				if(id != "login" && (l.sid == 0 || l.pass == 0)) {
+					$.mobile.changePage("#login", {transition: "none"});
+				}
 			});
 
 			$(document).bind('pageinit', function(e) {
@@ -789,6 +794,31 @@
 
 					$("#gotoButton").on("vclick", function() {
 						genDay($("#gotoDateBox").datebox('getTheDate'));
+					});
+
+					$("#loginSubmit").on("vclick", function() {
+						showToast("Logging in...");
+						$.ajax({
+							url: "http://hdubapp.com/ServerSideInDev/userAuth.php",
+							type: "GET",
+							dataType: "text",
+							data: {sid: $("#loginSid").val(),
+										pass: $("#loginPass").val()},
+							timeout: 10000,
+							success: function(d) {
+								if(d == "yay") {
+									showToast("Login successful");
+									l.sid = $("#loginSid").val();
+									l.pass = $("#loginPass").val();
+									indexAndFetch();
+								} else {
+									showToast("Login failed");
+								}
+							},
+							error: function() {
+								showToast("Error logging in");
+							}
+						});
 					});
 
 					$('body').bind('swiperight', function() { prvDay(); });
@@ -1079,14 +1109,14 @@
 			<div class="ui-body ui-body-c">
 				<h2>Welcome to hDub! You need to log in:</h2>
 		    <label for="sid">Student ID Number:</label>
-		    <input type="number" maxlength="6" min="100000" max="999999" value="hi" name="sid" id="sid" />
-		    <label for="pass">Access Code:</label>
-		    <input type="password" maxlength="4" name="pass" id="pass" />
-		    <input type="submit" data-theme="b" value="Sign in &raquo;" />
+		    <input type="number" maxlength="6" name="sid" id="loginSid" />
+		    <label for="pass">Login Code:</label>
+		    <input type="number" maxlength="5" name="pass" id="loginPass" />
+		    <input type="submit" data-theme="b" value="Log in &raquo;" id="loginSubmit" />
 
-		    <p>You should have received an email to your school address at the start of Term 1 with details on this app, along with your access code.<br/>
-		    If you didn't, or you lost your code, please visit <a href="hdub.kwiius.com" title="The hDub website">hdub.kwiius.com</a> and follow the instructions.</p>
-		    <p>You will only need to log in once on each device. You can log out in the settings screen.</p>
+		    <p>You should have received an email to your school address at the start of Term 1 with details on this app, along with your student ID number and login code (in bold).<br/>
+		    If you didn't, or you lost your email, please visit <a href="http://hdubapp.com" title="The hDub website">hdubapp.com</a> and follow the instructions.</p>
+		    <p>You should only need to log in once on each device.</p>
 			</div>
 		</div>
 	</div>
