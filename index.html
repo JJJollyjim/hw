@@ -158,8 +158,9 @@
 							showToast("Index server error");
 						}
 					},
-					error: function() {
+					error: function(a,b,c) {
 						showToast("Error indexing timetable");
+						conole.error(a,b,c);
 					}
 				});
 			}
