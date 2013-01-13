@@ -83,7 +83,7 @@
 			var supertexts = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th", 7: "th", 8: "th", 9: "th", 10: "th", 11: "th", 12: "th", 13: "th", 14: "th", 15: "th", 16: "th", 17: "th", 18: "th", 19: "th", 20: "th", 21: "st", 22: "nd", 23: "rd", 24: "th", 25: "th", 26: "th", 27: "th", 28: "th", 29: "th", 30: "th", 31: "st"};
 			var months = {0: "Jan", 1: "Feb", 2: "Mar", 3: "Apr", 4: "May", 5: "Jun", 6: "Jul", 7: "Aug", 8: "Sep", 9: "Oct", 10: "Nov", 11: "Dec"};
 			var fullMonths = {0: "Janurary", 1: "Feburary", 2: "March", 3: "April", 4: "May", 5: "June", 6: "July", 7: "August", 8: "September", 9: "October", 10: "November", 11: "December"};
-			var template = [{"type":"class", "period":"1"}, {"type":"class", "period":"2"}, {"type":"break", "name":"Form Time & Interval"}, {"type":"class", "period":"3"}, {"type":"class", "period":"4"}, {"type":"break", "name":"Lunchtime"}, {"type":"class", "period":"5"}, {"type":"class", "period":"6"}];
+			var template = [{"type":"class", "period":"1"}, {"type":"class", "period":"2"}, {"type":"break", "name":"Formtime/assembly/interval"}, {"type":"class", "period":"3"}, {"type":"class", "period":"4"}, {"type":"break", "name":"Lunchtime"}, {"type":"class", "period":"5"}, {"type":"class", "period":"6"}];
 			var pdTimes = {1: {1: [525,575], 2: [575,625], 3: [660,710], 4: [710,760], 5: [820,870], 6: [870,920]}}
 
 			function isJson(str) {
@@ -133,6 +133,73 @@
 						$.mobile.loading("hide");
 					}
 				});
+			}
+
+			function syncUp() {
+				$.mobile.loading("show");
+				$.ajax({
+					url: "http://hdubapp.com/ServerSideInDev/syncUp.php",
+					type: "POST",
+					dataType: "json",
+					data: {sid: l.sid,
+								pass: l.pass,
+									hw: l.dateHW},
+					timeout: 10000,
+					success: function(d) {
+						$.mobile.loading("hide");
+						if(d.error != undefined) {
+							if(d.error == "Err1") {
+								showToast("Authentication error");
+							} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err6") {
+								showToast("Database access error");
+							} else if (d.error == "Err5") {
+								showToast("Data index error");
+							} else {
+								showToast("Unknown error");
+							}
+						}
+					},
+					error: function() {
+						$.mobile.loading("hide");
+					}
+				});
+			}
+
+			function syncDown() {
+				if(l.sid != 0 && l.pass != 0) {
+					$.ajax({
+						url: "http://hdubapp.com/ServerSideInDev/syncDown.php",
+						type: "POST",
+						dataType: "json",
+						data: {sid: l.sid,
+									pass: l.pass,
+										hw: l.dateHW},
+						timeout: 10000,
+						success: function(d) {
+							console.log(d);
+							if(d.error != undefined) {
+								if(d.error == "Err1") {
+									showToast("Authentication error");
+								} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err6") {
+									showToast("Database access error");
+								} else if (d.error == "Err5") {
+									showToast("Data index error");
+								} else {
+									showToast("Unknown error");
+								}
+							} else if(d.changed != undefined) {
+								if(d.changed == 1) {
+									if(isJson(d.newStr)) {
+										showToast("HW changes downloaded");
+										l.dateHW = d.newStr;
+									} else {
+										sc("Invalid JSON");
+									}
+								}
+							}
+						}
+					});
+				}
 			}
 
 			function indexAndFetch() {
@@ -826,6 +893,7 @@
 									showToast("Getting timetable...");
 									l.sid = $("#loginSid").val();
 									l.pass = $("#loginPass").val();
+									l.dateHW = "{}";
 									indexAndFetch();
 								} else {
 									showToast("Login failed");
