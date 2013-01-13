@@ -132,6 +132,38 @@
 				});
 			}
 
+			function indexAndFetch() {
+				$.ajax({
+					url: "http://hdubapp.com/ServerSideInDev/indexer.php",
+					type: "GET",
+					dataType: "json",
+					data: {sid: l.sid,
+								pass: l.pass},
+					timeout: 20000,
+					success: function(d) {
+						if(d.error != undefined) {
+							if(d == "Err1") {
+								//Already indexed
+							} else if (d == "Err2" || d == "Err3" || d == "Err4" || d == "Err5" || d == "Err6" || d == "Err10" || d == "Err11" || d == "Err12") {
+								showToast("Database index error");
+							} else if (d == "Err7" || d == "Err9" || d == "Err15") {
+								showToast("Data index error");
+							} else {
+								showToast("Unknown error");
+							}
+						}	else if(d.success != undefined) {
+							showToast("Timetable indexed");
+							fetchClassList();
+						} else {
+							showToast("Index server error");
+						}
+					},
+					error: function() {
+						showToast("Error indexing timetable");
+					}
+				});
+			}
+
 			function conToast() {
 				req = checkCon();
 				req.error(function() {
@@ -435,10 +467,8 @@
 				html = "";
 				if($(".hwSortBtn.ui-btn-active").length == 2) {
 					$("#classSortBtn").removeClass("ui-btn-active");
-					sc(2);
 				} else if($(".hwSortBtn.ui-btn-active").length == 0) {
 					$("#dateSortBtn").addClass("ui-btn-active");
-					sc(0);
 				}
 				allhwcount = 0;
 				if($(".hwSortBtn.ui-btn-active").attr("id") == "dateSortBtn") {
@@ -966,7 +996,7 @@
 	                                                              -->
 	<div data-role="page" id="pg1" data-theme="d">
 		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
-			<a href="#goto" data-icon="grid" data-rel="dialog" data-transition="pop">Go to</a>
+			<a href="#goto" data-icon="grid" class="gotoGotoBtn" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
 			<a href="#addhw" data-icon="plus" class="ui-btn-right">HW</a>
 			<div data-role="navbar" class="np-page no-blue">
@@ -1003,7 +1033,7 @@
 		                                        
 	<div data-role="page" id="pg2" data-theme="d">
 		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
-			<a href="#goto" data-icon="grid" data-rel="dialog" data-transition="pop">Go to</a>
+			<a href="#goto" data-icon="grid" class="gotoGotoBtn" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
 			<a href="#addhw" data-icon="plus" class="ui-btn-right">HW</a>
 			<div data-role="navbar" class="np-page no-blue">
