@@ -55,6 +55,7 @@
 			var hwOld = false;
 			var dd;
 			var td;
+			var savedSortBtn = "dateSortBtn";
 
 			if(l.loggedIn != 1) {
 				//console.log("LOGIN");
@@ -422,6 +423,11 @@
 				showToast("Not saved");
 			}
 
+			function sc(i) {
+				showToast(i);
+				console.warn("SC:", i);
+			}
+
 			function updateHWPage() {
 				dhw = JSON.parse(l.dateHW);
 				dhw = sortOBJ(dhw);
@@ -429,8 +435,10 @@
 				html = "";
 				if($(".hwSortBtn.ui-btn-active").length == 2) {
 					$("#classSortBtn").removeClass("ui-btn-active");
+					sc(2);
 				} else if($(".hwSortBtn.ui-btn-active").length == 0) {
 					$("#dateSortBtn").addClass("ui-btn-active");
+					sc(0);
 				}
 				allhwcount = 0;
 				if($(".hwSortBtn.ui-btn-active").attr("id") == "dateSortBtn") {
@@ -709,6 +717,13 @@
 					hwOld = false;
 					$("#hwOldBtn").show();
 					$("#hwNewBtn").hide();
+					if(savedSortBtn == "classSortBtn") {
+						$("#dateSortBtn").removeClass("ui-btn-active");
+						$("#classSortBtn").addClass("ui-btn-active");
+					} else {
+						$("#classSortBtn").removeClass("ui-btn-active");
+						$("#dateSortBtn").addClass("ui-btn-active");
+					}
 					updateHWPage();
 				}
 
@@ -817,6 +832,7 @@
 					});
 
 					$(".hwSortBtn").on("click", function () {
+						savedSortBtn = $(this).attr("id");
 						if($(this).attr("id") == $(".hwSortBtn.ui-btn-active").attr("id")) {
 							setTimeout("updateHWPage()", 500);
 						}
@@ -1108,7 +1124,7 @@
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
 				<li><a href="#pg1" class="email" data-icon="custom" data-transition="none">Timetable</a></li>
-				<li><a href="#" class="coffee" data-icon="custom" data-transition="none">Homework</a></li>
+				<li><a href="#hw" class="coffee" data-icon="custom" data-transition="none">Homework</a></li>
 				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist skull">Settings</a></li>
 			</ul>
 			</div>
