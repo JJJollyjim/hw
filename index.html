@@ -56,6 +56,7 @@
 			var dd;
 			var td;
 			var savedSortBtn = "dateSortBtn";
+			var syncincUp = false;
 
 			if(l.loggedIn != 1) {
 				//console.log("LOGIN");
@@ -136,6 +137,7 @@
 			}
 
 			function syncUp() {
+				syncincUp = true;
 				$.mobile.loading("show");
 				$.ajax({
 					url: "http://hdubapp.com/ServerSideInDev/syncup.php",
@@ -146,6 +148,7 @@
 									hw: l.dateHW},
 					timeout: 10000,
 					success: function(d) {
+						syncincUp = false;
 						$.mobile.loading("hide");
 						if(d.error != undefined) {
 							if(d.error == "Err1") {
@@ -160,13 +163,14 @@
 						}
 					},
 					error: function() {
+						syncincUp = false;
 						$.mobile.loading("hide");
 					}
 				});
 			}
 
 			function syncDown() {
-				if(l.sid != 0 && l.pass != 0) {
+				if(l.sid != 0 && l.pass != 0 && syncincUp == false) {
 					$.ajax({
 						url: "http://hdubapp.com/ServerSideInDev/syncdown.php",
 						type: "POST",
@@ -176,7 +180,6 @@
 										hw: l.dateHW},
 						timeout: 10000,
 						success: function(d) {
-							console.log(d);
 							if(d.error != undefined) {
 								if(d.error == "Err1") {
 									showToast("Authentication error");
@@ -192,8 +195,6 @@
 									if(isJson(d.newStr)) {
 										showToast("HW changes downloaded");
 										l.dateHW = d.newStr;
-									} else {
-										sc("Invalid JSON");
 									}
 								}
 							}
@@ -529,6 +530,7 @@
 						$("#taskInput").val("");
 						$("#detailInput").val("");
 					}, 300);
+					syncUp();
 				} else {
 					showToast("Not saved");
 				}
@@ -726,6 +728,7 @@
 				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
+					syncUp();
 					showToast("Item Deleted");
 					$.mobile.changePage("#hw", {reverse: true});
 				}
@@ -740,6 +743,7 @@
 				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
+					syncUp();
 					showToast("Item Deleted");
 					updateClassPage();
 				}
@@ -796,6 +800,7 @@
 				dhw[date][period].push({name: $("#taskEditInput").val(), details: $("#detailEditInput").val()});
 
 				l.dateHW = JSON.stringify(dhw);	
+				syncUp();
 
 				$.mobile.changePage("#hw", {transition: "pop", reverse: true});
 			}
@@ -858,6 +863,7 @@
 				//console.log("Page initiated with target ID of "+id);
 
 				if(firstInit) {
+					setInterval('syncDown();', 10000);
 					dot = new Date;
 					console.warn("sfi", dot.getTime());
 					$.event.special.swipe.verticalDistanceThreshold = 50;
