@@ -138,7 +138,7 @@
 			function syncUp() {
 				$.mobile.loading("show");
 				$.ajax({
-					url: "http://hdubapp.com/ServerSideInDev/syncUp.php",
+					url: "http://hdubapp.com/ServerSideInDev/syncup.php",
 					type: "POST",
 					dataType: "json",
 					data: {sid: l.sid,
@@ -168,7 +168,7 @@
 			function syncDown() {
 				if(l.sid != 0 && l.pass != 0) {
 					$.ajax({
-						url: "http://hdubapp.com/ServerSideInDev/syncDown.php",
+						url: "http://hdubapp.com/ServerSideInDev/syncdown.php",
 						type: "POST",
 						dataType: "json",
 						data: {sid: l.sid,
