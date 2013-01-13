@@ -182,6 +182,7 @@
 										hw: l.dateHW},
 						timeout: 10000,
 						success: function(d) {
+							console.warn(d);
 							if(d.error != undefined) {
 								if(d.error == "Err1") {
 									showToast("Authentication error");
