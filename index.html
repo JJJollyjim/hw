@@ -7,7 +7,7 @@
 <!DOCTYPE html> 
 <html>
 	<head>
-		<script src="http://192.168.2.50:8080/target/target-script-min.js#anonymous"></script>
+		<!--<script src="http://192.168.2.50:8080/target/target-script-min.js#anonymous"></script>-->
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"> 
 
@@ -168,6 +168,11 @@
 						console.error(a,b,c);
 					}
 				});
+			}
+
+			function logout() {
+				l.clear();
+				location.reload();
 			}
 
 			function conToast() {
@@ -631,7 +636,7 @@
 										})
 									html += '</ul>';
 								}
-							}period
+							}
 
 							html += '</div>';
 						} else if(this.type == "break") {
@@ -732,7 +737,7 @@
 				id = e.target.id;
 				//console.log("Page shown with target ID of "+id);
 				if(id == "goto") {
-					$("#gotoDateBox").datebox("open");
+					//$("#gotoDateBox").datebox("open");
 				} else if (id == "addhw") {
 					updateHWSubjects();
 				}
@@ -786,6 +791,8 @@
 				//console.log("Page initiated with target ID of "+id);
 
 				if(firstInit) {
+					dot = new Date;
+					console.warn("sfi", dot.getTime());
 					$.event.special.swipe.verticalDistanceThreshold = 50;
 
 					$("#toaster").toast();
@@ -796,8 +803,12 @@
 						$(".np-page").hide();
 					}
 
-					$("#gotoButton").on("vclick", function() {
+					$("#gotoButton").on("click", function() {
 						genDay($("#gotoDateBox").datebox('getTheDate'));
+					});
+
+					$("#gotoTodayButton").on("click", function() {
+						genDay(new Date);
 					});
 
 					$("#loginSubmit").on("vclick", function() {
@@ -929,6 +940,8 @@
 					});
 
 					firstInit = false;
+					dot = new Date;
+					console.warn("efi", dot.getTime());
 				}
 			});
 
@@ -1217,8 +1230,9 @@
 		<div data-role="content" data-theme="c">
 			<p>Click in the box below to select a date navigate to to:</p>
 			<label for="gotoDateBox" class="ui-hidden-accessible">Goto Date</label>
-			<input name="gotoDateBox" id="gotoDateBox" type="date" data-role="datebox" min="2013-01-01" max="2013-12-31" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": false, "blackDays": [0,6]}'>
-			<p><a href="#pg1" id="gotoButton" data-rel="back" data-role="button" data-inline="true" data-icon="arrow-r" data-theme="b">Go</a></p>
+			<input name="gotoDateBox" id="gotoDateBox" type="date" data-role="datebox" min="2013-01-01" max="2013-12-31" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": false, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": false, "blackDays": [0,6], "useHeader": false, "useAnimation": false}'>
+			<p><a href="#pg1" id="gotoTodayButton" data-rel="back" data-role="button" data-inline="true" data-icon="arrow-r" data-iconpos="right" data-theme="c">Today</a>
+			<a href="#pg1" id="gotoButton" data-rel="back" data-role="button" data-inline="true" data-icon="arrow-r" data-iconpos="right" data-theme="b">Go</a></p>
 		</div>
 	</div>
 
@@ -1240,7 +1254,7 @@
 			<form action="javascript:addHomework()" method="post" id="hwForm">
 				<div data-role="fieldcontain">
 					 <label for="hwDateBox">Due Date:</label>
-					 <input name="hwDateBox" id="hwDateBox" type="date" data-role="datebox" min="2013-01-01" max="2013-12-31" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": false, "blackDays": [0,6]}'>
+					 <input name="hwDateBox" id="hwDateBox" type="date" data-role="datebox" min="2013-01-01" max="2013-12-31" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": false, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": false, "blackDays": [0,6], "useHeader": false, "useAnimation": false}'>
 				</div>
 
 				<div data-role="fieldcontain" id="subjectSelect">
@@ -1307,7 +1321,7 @@
 				<form action="javascript:saveHWEdits()" method="post" id="hwEditForm">
 					<div data-role="fieldcontain">
 						 <label for="hwEditDateBox">Due Date:</label>
-						 <input name="hwEditDateBox" id="hwEditDateBox" type="date" data-role="datebox" min="2013-01-01" max="2013-12-31" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": true, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": false, "blackDays": [0,6]}'>
+						 <input name="hwEditDateBox" id="hwEditDateBox" type="date" data-role="datebox" min="2013-01-01" max="2013-12-31" placeholder="dd/mm/yyyy" data-options='{"mode": "calbox", "useTodayButton": false, "overrideDateFormat": "%d/%m/%Y", "useFocus": true, "useButton": false, "blackDays": [0,6], "useHeader": false, "useAnimation": false}'>
 					</div>
 
 					<div data-role="fieldcontain" id="subjectEditSelect">
