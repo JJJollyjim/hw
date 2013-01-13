@@ -113,6 +113,7 @@
 								pass: l.pass},
 					timeout: 10000,
 					success: function(d) {
+						$.mobile.loader("hide");
 						if(d == "Err1") {
 							showToast("Authentication error");
 						} else if (d == "Err2" || d == "Err3" || d == "Err4" || d == "Err6") {
@@ -129,6 +130,7 @@
 					},
 					error: function() {
 						showToast("Error fetching timetable");
+						$.mobile.loader("hide");
 					}
 				});
 			}
@@ -143,6 +145,7 @@
 					timeout: 60000,
 					success: function(d) {
 						if(d.error != undefined) {
+							$.mobile.loader("hide");
 							if(d.error == "Err1") {
 								fetchClassList();
 							} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err5" || d.error == "Err6" || d.error == "Err10" || d.error == "Err11" || d.error == "Err12") {
@@ -157,6 +160,7 @@
 							fetchClassList();
 						} else {
 							showToast("Index server error");
+							$.mobile.loader("hide");
 						}
 					},
 					error: function(a,b,c) {
@@ -627,7 +631,7 @@
 										})
 									html += '</ul>';
 								}
-							}
+							}period
 
 							html += '</div>';
 						} else if(this.type == "break") {
@@ -647,7 +651,7 @@
 				period = $("#hwDataStore").data("period");
 				num = $("#hwDataStore").data("num");
 
-				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
+				if(confirm("Delete homework item '"+dhw[date][][num]["name"]+"'?")) {
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
 					showToast("Item Deleted");
@@ -798,6 +802,7 @@
 
 					$("#loginSubmit").on("vclick", function() {
 						showToast("Logging in...");
+						$.mobile.loader("show");
 						$.ajax({
 							url: "http://hdubapp.com/ServerSideInDev/userAuth.php",
 							type: "GET",
@@ -807,16 +812,18 @@
 							timeout: 10000,
 							success: function(d) {
 								if(d == "yay") {
-									showToast("Login successful");
+									showToast("Getting timetable...");
 									l.sid = $("#loginSid").val();
 									l.pass = $("#loginPass").val();
 									indexAndFetch();
 								} else {
 									showToast("Login failed");
+									$.mobile.loader("hide");
 								}
 							},
 							error: function() {
 								showToast("Error logging in");
+								$.mobile.loader("hide");
 							}
 						});
 					});
