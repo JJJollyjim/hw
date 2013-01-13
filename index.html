@@ -113,7 +113,7 @@
 								pass: l.pass},
 					timeout: 10000,
 					success: function(d) {
-						$.mobile.loader("hide");
+						$.mobile.loading("hide");
 						if(d == "Err1") {
 							showToast("Authentication error");
 						} else if (d == "Err2" || d == "Err3" || d == "Err4" || d == "Err6") {
@@ -130,7 +130,7 @@
 					},
 					error: function() {
 						showToast("Error fetching timetable");
-						$.mobile.loader("hide");
+						$.mobile.loading("hide");
 					}
 				});
 			}
@@ -145,7 +145,7 @@
 					timeout: 60000,
 					success: function(d) {
 						if(d.error != undefined) {
-							$.mobile.loader("hide");
+							$.mobile.loading("hide");
 							if(d.error == "Err1") {
 								fetchClassList();
 							} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err5" || d.error == "Err6" || d.error == "Err10" || d.error == "Err11" || d.error == "Err12") {
@@ -160,7 +160,7 @@
 							fetchClassList();
 						} else {
 							showToast("Index server error");
-							$.mobile.loader("hide");
+							$.mobile.loading("hide");
 						}
 					},
 					error: function(a,b,c) {
@@ -802,7 +802,7 @@
 
 					$("#loginSubmit").on("vclick", function() {
 						showToast("Logging in...");
-						$.mobile.loader("show");
+						$.mobile.loading("show");
 						$.ajax({
 							url: "http://hdubapp.com/ServerSideInDev/userAuth.php",
 							type: "GET",
@@ -818,12 +818,12 @@
 									indexAndFetch();
 								} else {
 									showToast("Login failed");
-									$.mobile.loader("hide");
+									$.mobile.loading("hide");
 								}
 							},
 							error: function() {
 								showToast("Error logging in");
-								$.mobile.loader("hide");
+								$.mobile.loading("hide");
 							}
 						});
 					});
