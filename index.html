@@ -651,7 +651,7 @@
 				period = $("#hwDataStore").data("period");
 				num = $("#hwDataStore").data("num");
 
-				if(confirm("Delete homework item '"+dhw[date][][num]["name"]+"'?")) {
+				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
 					showToast("Item Deleted");
