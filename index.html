@@ -170,6 +170,7 @@
 			}
 
 			function syncDown() {
+				console.error(syncingUp);
 				if(l.sid != 0 && l.pass != 0 && syncincUp == false) {
 					$.ajax({
 						url: "http://hdubapp.com/ServerSideInDev/syncdown.php",
