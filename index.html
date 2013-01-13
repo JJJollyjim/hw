@@ -7,7 +7,7 @@
 <!DOCTYPE html> 
 <html>
 	<head>
-		<!--<script src="http://192.168.2.50:8080/target/target-script-min.js#anonymous"></script>-->
+		<script src="http://192.168.2.50:8080/target/target-script-min.js#anonymous"></script>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"> 
 
@@ -170,7 +170,9 @@
 			}
 
 			function syncDown() {
+				console.log(l.sid, l.pass, syncingUp);
 				if(l.sid != 0 && l.pass != 0 && syncingUp == false) {
+					console.log("Syncing down!");
 					$.ajax({
 						url: "http://hdubapp.com/ServerSideInDev/syncdown.php",
 						type: "POST",
