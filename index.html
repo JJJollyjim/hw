@@ -142,11 +142,11 @@
 					timeout: 20000,
 					success: function(d) {
 						if(d.error != undefined) {
-							if(d == "Err1") {
+							if(d.error == "Err1") {
 								//Already indexed
-							} else if (d == "Err2" || d == "Err3" || d == "Err4" || d == "Err5" || d == "Err6" || d == "Err10" || d == "Err11" || d == "Err12") {
+							} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err5" || d.error == "Err6" || d.error == "Err10" || d.error == "Err11" || d.error == "Err12") {
 								showToast("Database index error");
-							} else if (d == "Err7" || d == "Err9" || d == "Err15") {
+							} else if (d.error == "Err7" || d.error == "Err9" || d.error == "Err15") {
 								showToast("Data index error");
 							} else {
 								showToast("Unknown error");
@@ -158,9 +158,8 @@
 							showToast("Index server error");
 						}
 					},
-					error: function(a,b,c) {
+					error: function() {
 						showToast("Error indexing timetable");
-						conole.error(a,b,c);
 					}
 				});
 			}
