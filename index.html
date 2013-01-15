@@ -77,8 +77,12 @@
 				l.pass = 0;
 			}
 			
-			if(l.lastSynced == undefined) {
-				l.lastSynced = 0;
+			if(l.higheid == undefined) {
+				l.higheid = 0;
+			}
+			
+			if(l.ass == undefined) {
+				l.ass = "false";
 			}
 			
 			if(l.unsyncedEvents == undefined) {
@@ -151,7 +155,7 @@
 				});
 			}
 
-			function hwid() {
+			function genHwid() {
 			  var S4 = function ()
 			  {
 			      return Math.floor(
@@ -169,6 +173,7 @@
 			}
 
 			function stringUp() {
+				console.error("STRINGUP", l.dateHW);
 				$.mobile.loading("show");
 				$.ajax({
 					url: "http://hdubapp.com/ServerSideInDev/stringup.php",
@@ -220,7 +225,11 @@
 						} else if(d.hw != undefined) {
 							if(isJson(d.hw)) {
 								l.dateHW = d.hw;
+								console.log("STRING SAVED", d.hw);
 							}
+							console.log("HID from "+l.higheid+" to "+d.higheid);
+							l.higheid = d.higheid;
+							l.ass = "true";
 						}
 					},
 					error: function(a,b,c) {
@@ -228,6 +237,48 @@
 						console.log(a,b,c);
 					}
 				});
+			}
+
+			function eventSync() {
+				if(l.higheid == null || l.higheid == undefined || l.higheid == "") {
+					l.higheid = "0";
+				}
+				if(l.sid != 0 && l.ass == "true") {
+					$.ajax({
+						url: "http://hdubapp.com/ServerSideInDev/sync.php", 
+						type: "POST",
+						dataType: "json",
+						data: {sid: l.sid,
+									pass: l.pass,
+							 higheid: l.higheid,
+								events: l.unsyncedEvents},
+						timeout: 20000,
+						success: function(d) {
+							if(d.error != undefined) {
+								if(d.error == "Err1") {
+									showToast("Authentication error");
+								} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err6" || d.error == "Err7" || d.error == "Err8" || d.error == "Err9") {
+									showToast("Database access error");
+								} else if (d.error == "Err5") {
+									showToast("Data index error");
+								} else {
+									showToast("Unknown error");
+								}
+							} else if(d.success != undefined) {
+								console.log("HID from "+l.higheid+" to "+d.newHigh);
+								l.higheid = d.newHigh;
+								if(d.newEventsNum > 0 || d.yourEventsNum > 0) {
+									if(d.newEventsNum > 0) {
+										applyEvents(d.newEvents);
+										console.log("APPLYING NEW EVENTS: "+d.newEventsNum, d.newEvents);
+									}
+									stringUp();
+								}
+								l.unsyncedEvents = "{}";
+							}
+						}
+					});
+				}
 			}
 
 			function indexAndFetch() {
@@ -484,7 +535,7 @@
 			function applyEvents(events) {
 				for(var aei=1; aei<=objSize(events); aei++) {
 					if(events[aei] != undefined) {
-						applyEvent(events[aei]);
+						applyEvent(JSON.parse(events[aei]));
 						if($.mobile.activePage.attr("id") == "hw") {
 							updateHWPage();
 						}
@@ -545,16 +596,16 @@
 							$(dhw[date][period]).each(function() {
 								html += '<div class="ui-body ui-body-d classHWItem" data-date="'+date+'" data-period="'+period+'"" data-num="'+num+'">';
 
-								html += '<h3>'+dhw[date][period][num]["name"]+':</h3>';
+								html += '<h3>'+dhw[date][period][num]["name"]+'</h3>';
 								if(dhw[date][period][num]["details"] != "" && dhw[date][period][num]["details"] != " ") {
 									html += '<p>'+dhw[date][period][num]["details"]+'</p>';
 								}
 
-								html += '<div class="ui-grid-b">';
+								/*html += '<div class="ui-grid-b">';
 									html += '<div class="ui-block-a switchaa"><a href="#" class="classHWButton classHWEditButton" data-role="button" data-theme="c">Edit</a></div>';
 									html += '<div class="ui-block-b switchab"><a href="#" class="classHWButton classHWDelButton" data-role="button" data-theme="c">Delete</a></div>';
 									html += '<div class="ui-block-c switchac"><a href="#" class="classHWButton classHWViewButton" data-role="button" data-theme="c">View</a></div>';
-								html += '</div>'
+								html += '</div>'*/
 
 								html += '</div><br/>';
 								num++;
@@ -610,7 +661,7 @@
 					classes = JSON.parse(l.dateClasses)[storeDate];
 					dhw = JSON.parse(l.dateHW);
 					classnum = parseInt($(".subjectChoice:checked").val().substr(8));
-					hwid = hwid();
+					hwid = genHwid();
 
 					if(dhw[storeDate] == undefined) {
 						dhw[storeDate] = {};
@@ -651,8 +702,13 @@
 				} else if($(".hwSortBtn.ui-btn-active").length == 0) {
 					$("#dateSortBtn").addClass("ui-btn-active");
 				}
+				if(savedSortBtn != undefined) {
+					hsbstr = savedSortBtn;
+				} else {
+					hsbstr = $(".hwSortBtn.ui-btn-active").attr("id");
+				}
 				allhwcount = 0;
-				if($(".hwSortBtn.ui-btn-active").attr("id") == "dateSortBtn") {
+				if(hsbstr == "dateSortBtn") {
 					for (key in dhw) {
 						dd = resetHrs(dateFromStore(key));
 						td = resetHrs(new Date);
@@ -968,6 +1024,8 @@
 				//console.log("Page initiated with target ID of "+id);
 
 				if(firstInit) {
+					eventSync();
+					setInterval('eventSync()', 5000);
 					$.event.special.swipe.verticalDistanceThreshold = 50;
 
 					$("#toaster").toast();
@@ -1009,7 +1067,7 @@
 									$.mobile.loading("hide");
 								}
 							},
-							error: function() {
+							error: function(a,b,c) {
 								showToast("Error logging in");
 								$.mobile.loading("hide");
 							}
@@ -1306,9 +1364,9 @@
 			<div class="ui-body ui-body-c">
 				<h2>Welcome to hDub! You need to log in:</h2>
 		    <label for="sid">Student ID Number:</label>
-		    <input type="number" maxlength="6" name="sid" id="loginSid" />
+		    <input type="text" maxlength="6" name="sid" id="loginSid" />
 		    <label for="pass">Login Code:</label>
-		    <input type="number" maxlength="5" name="pass" id="loginPass" />
+		    <input type="text" maxlength="5" name="pass" id="loginPass" />
 		    <input type="submit" data-theme="b" value="Log in &raquo;" id="loginSubmit" />
 
 		    <p>You should have received an email to your school address at the start of Term 1 with details on this app, along with your student ID number and login code (in bold).<br/>
@@ -1375,7 +1433,7 @@
 		<div data-role="content" data-theme="d">	
 			<h2>Settings</h2>
 			<p>DOES HYDRA EVEN WORK!?!</p>		
-			<p><a href="#login" data-role="button" data-transition="pop">Login</a></p>
+			<p><a href="javascript:logout()" data-role="button">Login</a></p>
 			<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
 		</div>
 		
@@ -1557,10 +1615,9 @@
 			<p id="classDate">Error</p>
 			<p id="classPeriod">Error</p>
 			<p id="classHW">Error</p>
-			<div class="ui-grid-b">
+			<div class="ui-grid-a">
 				<div class="ui-block-a switchaa"><a href="#addhw" id="classEditButton" data-icon="plus" data-role="button" data-theme="c">HW</a></div>
-				<div class="ui-block-b switchab"><a href="#" id="classDelButton"  data-role="button" data-theme="c">Delete</a></div>
-				<div class="ui-block-c switchac"><a href="#" id="classDoneButton"  data-rel="back" data-role="button" data-theme="b">Done</a></div>
+				<div class="ui-block-b switchab"><a href="#" id="classDoneButton"  data-rel="back" data-role="button" data-theme="b">Done</a></div>
 			</div>
 		</div>
 	</div>
