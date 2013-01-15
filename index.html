@@ -56,7 +56,6 @@
 			var dd;
 			var td;
 			var savedSortBtn = "dateSortBtn";
-			var syncingUp = false;
 
 			if(l.loggedIn != 1) {
 				//console.log("LOGIN");
@@ -78,6 +77,14 @@
 				l.pass = 0;
 			}
 			
+			if(l.lastSynced == undefined) {
+				l.lastSynced = 0;
+			}
+			
+			if(l.unsyncedEvents == undefined) {
+				l.unsyncedEvents = "{}";
+			}
+			
 			//l.dateClasses = '{}';
 
 			var days = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"};
@@ -86,6 +93,14 @@
 			var fullMonths = {0: "Janurary", 1: "Feburary", 2: "March", 3: "April", 4: "May", 5: "June", 6: "July", 7: "August", 8: "September", 9: "October", 10: "November", 11: "December"};
 			var template = [{"type":"class", "period":"1"}, {"type":"class", "period":"2"}, {"type":"break", "name":"Formtime/assembly/interval"}, {"type":"class", "period":"3"}, {"type":"class", "period":"4"}, {"type":"break", "name":"Lunchtime"}, {"type":"class", "period":"5"}, {"type":"class", "period":"6"}];
 			var pdTimes = {1: {1: [525,575], 2: [575,625], 3: [660,710], 4: [710,760], 5: [820,870], 6: [870,920]}}
+
+			objSize = function(obj) {
+		    var siz = 0, key;
+		    for (key in obj) {
+		      if (obj.hasOwnProperty(key)) siz++;
+		    }
+		    return siz;
+			};
 
 			function isJson(str) {
 		    try {
@@ -136,19 +151,34 @@
 				});
 			}
 
-			function syncUp() {
-				syncingUp = true;
+			function hwid() {
+			  var S4 = function ()
+			  {
+			      return Math.floor(
+			              Math.random() * 0x10000 /* 65536 */
+			          ).toString(16);
+			  };
+
+			  return (
+			          S4() + S4() + "-" +
+			          S4() + "-" +
+			          S4() + "-" +
+			          S4() + "-" +
+			          S4() + S4() + S4()
+			      );
+			}
+
+			function stringUp() {
 				$.mobile.loading("show");
 				$.ajax({
-					url: "http://hdubapp.com/ServerSideInDev/syncup.php",
+					url: "http://hdubapp.com/ServerSideInDev/stringup.php",
 					type: "POST",
 					dataType: "json",
 					data: {sid: l.sid,
 								pass: l.pass,
-									hw: l.dateHW},
-					timeout: 10000,
+								 str: l.dateHW},
+					timeout: 20000,
 					success: function(d) {
-						syncingUp = false;
 						$.mobile.loading("hide");
 						if(d.error != undefined) {
 							if(d.error == "Err1") {
@@ -163,50 +193,41 @@
 						}
 					},
 					error: function() {
-						syncingUp = false;
 						$.mobile.loading("hide");
 					}
 				});
 			}
 
-			function syncDown() {
-				console.log(l.sid, l.pass, syncingUp);
-				if(l.sid != 0 && l.pass != 0 && syncingUp == false) {
-					console.log("Syncing down!");
-					$.ajax({
-						url: "http://hdubapp.com/ServerSideInDev/syncdown.php",
-						type: "POST",
-						dataType: "json",
-						data: {sid: l.sid,
-									pass: l.pass,
-										hw: l.dateHW},
-						timeout: 10000,
-						success: function(d) {
-							console.warn(d);
-							if(d.error != undefined) {
-								if(d.error == "Err1") {
-									showToast("Authentication error");
-								} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err6") {
-									showToast("Database access error");
-								} else if (d.error == "Err5") {
-									showToast("Data index error");
-								} else {
-									showToast("Unknown error");
-								}
-							} else if(d.changed != undefined) {
-								if(d.changed == 1) {
-									if(isJson(d.newStr)) {
-										showToast("HW changes downloaded");
-										l.dateHW = d.newStr;
-									}
-								}
+			function dlString() {
+				$.ajax({
+					url: "http://hdubapp.com/ServerSideInDev/stringdown.php",
+					type: "POST",
+					dataType: "json",
+					data: {sid: l.sid,
+								pass: l.pass},
+					timeout: 20000,
+					success: function(d) {
+						if(d.error != undefined) {
+							if(d.error == "Err1") {
+								showToast("Authentication error");
+							} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err6") {
+								showToast("Database access error");
+							} else if (d.error == "Err5") {
+								showToast("Data index error");
+							} else {
+								showToast("Unknown error");
 							}
-						},
-						error: function(a,b,c) {
-							console.error(a,b,c);
+						} else if(d.hw != undefined) {
+							if(isJson(d.hw)) {
+								l.dateHW = d.hw;
+							}
 						}
-					});
-				}
+					},
+					error: function(a,b,c) {
+						showToast("Could not download timetable");
+						console.log(a,b,c);
+					}
+				});
 			}
 
 			function indexAndFetch() {
@@ -399,6 +420,78 @@
 				return new Date(spl[0], parseInt(spl[1])-1, spl[2]);
 			}
 
+			function storeAdd(hwid, date, period, name, details) {
+				ue = JSON.parse(l.unsyncedEvents);
+				ue[objSize(ue)+1] = {type: "add", hwid: hwid, date: date, period: period, name: name, details: details};
+				l.unsyncedEvents = JSON.stringify(ue);
+			}
+
+			function storeDel(hwid) {
+				ue = JSON.parse(l.unsyncedEvents);
+				ue[objSize(ue)+1] = {type: "del", hwid: hwid};
+				l.unsyncedEvents = JSON.stringify(ue);
+			}
+
+			function infoFromHwid(hwid) {
+				dhw = JSON.parse(l.dateHW);
+				for(key in dhw) {
+					for (key2 in dhw[key]) {
+						for (key3 in dhw[key][key2]) {
+							if(dhw[key][key2][key3]["hwid"] == hwid) {
+								return {date: key, period: key2, num: key3};
+							}
+						}
+					}
+				}
+				return false;
+			}
+
+			function applyAdd(event) {
+				dhw = JSON.parse(l.dateHW);
+				
+				if(dhw[event.date] == undefined) {
+					dhw[event.date] = {};
+				}
+
+				if(dhw[event.date][event.period] == undefined) {
+					dhw[event.date][event.period] = [];
+				}
+
+				dhw[event.date][event.period].push({name: event.name, details: event.details, hwid: event.hwid});
+				l.dateHW = JSON.stringify(dhw);
+			}
+
+			function applyDel(event) {
+				dhw = JSON.parse(l.dateHW);
+				info = infoFromHwid(event.hwid);
+
+				if(info != false && info != undefined) {
+					dhw[info.date][info.period].splice(info.num, 1);
+				} else {
+					showToast("Sync error");
+				}
+				l.dateHW = JSON.stringify(dhw);
+			}
+
+			function applyEvent(event) {
+				if(event.type == "add") {
+					applyAdd(event);
+				} else if (event.type == "del") {
+					applyDel(event);
+				}
+			}
+
+			function applyEvents(events) {
+				for(var aei=1; aei<=objSize(events); aei++) {
+					if(events[aei] != undefined) {
+						applyEvent(events[aei]);
+						if($.mobile.activePage.attr("id") == "hw") {
+							updateHWPage();
+						}
+					}
+				}
+			}
+
 			function updateHWSubjects() {
 				d = $("#hwDateBox").datebox("getTheDate");
 				storeDate = genStoreDate(d);
@@ -517,6 +610,7 @@
 					classes = JSON.parse(l.dateClasses)[storeDate];
 					dhw = JSON.parse(l.dateHW);
 					classnum = parseInt($(".subjectChoice:checked").val().substr(8));
+					hwid = hwid();
 
 					if(dhw[storeDate] == undefined) {
 						dhw[storeDate] = {};
@@ -526,7 +620,8 @@
 						dhw[storeDate][classnum] = [];
 					}
 
-					dhw[storeDate][classnum].push({name: $("#taskInput").val(), details: $("#detailInput").val()});
+					dhw[storeDate][classnum].push({name: $("#taskInput").val(), details: $("#detailInput").val(), hwid: hwid});
+					storeAdd(hwid, storeDate, classnum, $("#taskInput").val(), $("#detailInput").val());
 
 					l.dateHW = JSON.stringify(dhw);
 					showToast("Saved");
@@ -535,7 +630,7 @@
 						$("#taskInput").val("");
 						$("#detailInput").val("");
 					}, 300);
-					syncUp();
+					//syncUp();
 				} else {
 					showToast("Not saved");
 				}
@@ -567,7 +662,7 @@
 								hwcount = 0;
 								for (key2 in dhw[key]) {
 									for (key3 in dhw[key][key2]) {
-										dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+'><a href="#hwdetail" class="hwListItemLink">';
+										dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+' data-hwid='+dhw[key][key2][key3]["hwid"]+'><a href="#hwdetail" class="hwListItemLink">';
 										dhtml += '<h3>'+dhw[key][key2][key3]["name"]+'</h3>';
 										dhtml += '<p>'+dcl[key][key2]["name"]+' (Period '+key2+')</p>';
 										dhtml += '</a></li>';
@@ -587,7 +682,7 @@
 								hwcount = 0;
 								for (key2 in dhw[key]) {
 									for (key3 in dhw[key][key2]) {
-										dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+'><a href="#hwdetail" class="hwListItemLink">';
+										dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+' data-hwid='+dhw[key][key2][key3]["hwid"]+'><a href="#hwdetail" class="hwListItemLink">';
 										dhtml += '<h3>'+dhw[key][key2][key3]["name"]+'</h3>';
 										dhtml += '<p>'+dcl[key][key2]["name"]+' (Period '+key2+')</p>';
 										dhtml += '</a></li>';
@@ -643,7 +738,7 @@
 						for(key5 in tempConstruct[key4]) {
 							tc = tempConstruct[key4][key5];
 							
-							chtml += '<li class="hwListItem" data-date='+tc["date"]+' data-period='+tc["period"]+' data-num='+tc["num"]+'><a href="#hwdetail">';
+							chtml += '<li class="hwListItem" data-date='+tc["date"]+' data-period='+tc["period"]+' data-num='+tc["num"]+' data-hwid='+dhw[tc["date"]][tc["period"]][tc["num"]]["name"]+'><a href="#hwdetail">';
 							chtml += '<h3>'+dhw[tc["date"]][tc["period"]][tc["num"]]["name"]+'</h3>';
 							chtml += '<p>'+genDate(dateFromStore(tc["date"]))+' (Period '+tc["period"]+')</p>';
 							chtml += '</a></li>';
@@ -729,11 +824,13 @@
 				date = $("#hwDataStore").data("date");
 				period = $("#hwDataStore").data("period");
 				num = $("#hwDataStore").data("num");
+				hwid = $("#hwDataStore").data("hwid");
 
 				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
-					syncUp();
+					storeDel(hwid);
+					//syncUp();
 					showToast("Item Deleted");
 					$.mobile.changePage("#hw", {reverse: true});
 				}
@@ -748,7 +845,7 @@
 				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
-					syncUp();
+					//syncUp();
 					showToast("Item Deleted");
 					updateClassPage();
 				}
@@ -787,8 +884,10 @@
 				date = $("#hwDataStore").data("date");
 				period = $("#hwDataStore").data("period");
 				num = $("#hwDataStore").data("num");
+				hwid = $("#hwDataStore").data("hwid");
 
 				dhw[date][period].splice(num, 1);
+				storeDel(hwid);
 
 				jsDate = $("#hwEditDateBox").datebox("getTheDate");
 				date = genStoreDate(jsDate);
@@ -802,10 +901,11 @@
 					dhw[date][period] = [];
 				}
 
-				dhw[date][period].push({name: $("#taskEditInput").val(), details: $("#detailEditInput").val()});
+				dhw[date][period].push({name: $("#taskEditInput").val(), details: $("#detailEditInput").val(), hwid: hwid});
+				storeAdd(hwid, date, period, $("#taskEditInput").val(), $("#detailEditInput").val());
 
 				l.dateHW = JSON.stringify(dhw);	
-				syncUp();
+				//syncUp();
 
 				$.mobile.changePage("#hw", {transition: "pop", reverse: true});
 			}
@@ -868,8 +968,6 @@
 				//console.log("Page initiated with target ID of "+id);
 
 				if(firstInit) {
-					setInterval('syncDown();', 10000);
-					syncDown();
 					$.event.special.swipe.verticalDistanceThreshold = 50;
 
 					$("#toaster").toast();
@@ -905,6 +1003,7 @@
 									l.pass = $("#loginPass").val();
 									l.dateHW = "{}";
 									indexAndFetch();
+									dlString();
 								} else {
 									showToast("Login failed");
 									$.mobile.loading("hide");
@@ -944,10 +1043,12 @@
 						date = $(this).data("date");
 						period = $(this).data("period");
 						num = $(this).data("num");
+						hwid = $(this).data("hwid");
 
 						$("#hwDataStore").data("date", date);
 						$("#hwDataStore").data("period", period);
 						$("#hwDataStore").data("num", num);
+						$("#hwDataStore").data("hwid", hwid);
 						
 						jsDate = dateFromStore(date);
 						info = dhw[date][period][num];
