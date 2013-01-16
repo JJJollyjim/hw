@@ -225,9 +225,9 @@
 						} else if(d.hw != undefined) {
 							if(isJson(d.hw)) {
 								l.dateHW = d.hw;
-								console.log("STRING SAVED", d.hw);
+								//console.log("STRING SAVED", d.hw);
 							}
-							console.log("HID from "+l.higheid+" to "+d.higheid);
+							//console.log("HID from "+l.higheid+" to "+d.higheid);
 							l.higheid = d.higheid;
 							l.ass = "true";
 						}
@@ -265,7 +265,7 @@
 									showToast("Unknown error");
 								}
 							} else if(d.success != undefined) {
-								console.log("HID from "+l.higheid+" to "+d.newHigh);
+								//console.log("HID from "+l.higheid+" to "+d.newHigh);
 								l.higheid = d.newHigh;
 								if(d.newEventsNum > 0 || d.yourEventsNum > 0) {
 									if(d.newEventsNum > 0) {
@@ -1092,6 +1092,20 @@
 						}
 					});
 
+					if($(window).width() < 400) {
+						$(".switchab").removeClass("ui-block-b").addClass("ui-block-a");
+						$(".switchac").removeClass("ui-block-c").addClass("ui-block-a");
+
+						$(".switchsoloa").removeClass("ui-grid-a").addClass("ui-grid-solo");
+						$(".switchsolob").removeClass("ui-grid-b").addClass("ui-grid-solo");
+					} else {
+						$(".switchab").removeClass("ui-block-a").addClass("ui-block-b");
+						$(".switchac").removeClass("ui-block-a").addClass("ui-block-c");
+						
+						$(".switchsoloa").removeClass("ui-grid-solo").addClass("ui-grid-a");
+						$(".switchsolob").removeClass("ui-grid-solo").addClass("ui-grid-b");
+					}
+
 					$(".hwListItem").live("vclick", function() {
 						noEditHW();
 
@@ -1170,10 +1184,6 @@
 						showToast("New");
 						$("#hwOldBtn").show();
 						$("#hwNewBtn").hide();
-					});
-
-					$(window).resize(function() {
-						//console.log($(window).width());
 					});
 
 					firstInit = false;
@@ -1545,7 +1555,7 @@
 				<p id="hwDSubject">Subject: Chocolate Eating</p>
 				<p id="hwDDue">Due: 42<sup>nd</sup> Awesometober 1999</p>
 				<p id="hwDDesc">This is the only homework in this class that we've had all year...</p>
-				<div class="ui-grid-b">
+				<div class="ui-grid-b switchsolob">
 					<div class="ui-block-a switchaa"><a href="#" id="hwEditButton" data-role="button" data-theme="c">Edit</a></div>
 					<div class="ui-block-b switchab"><a href="#" id="hwDelButton"  data-role="button" data-theme="c">Delete</a></div>
 					<div class="ui-block-c switchac"><a href="#" id="hwDoneButton"  data-rel="back" data-role="button" data-theme="b">Done</a></div>
@@ -1615,7 +1625,7 @@
 			<p id="classDate">Error</p>
 			<p id="classPeriod">Error</p>
 			<p id="classHW">Error</p>
-			<div class="ui-grid-a">
+			<div class="ui-grid-a switchsoloa">
 				<div class="ui-block-a switchaa"><a href="#addhw" id="classEditButton" data-icon="plus" data-role="button" data-theme="c">HW</a></div>
 				<div class="ui-block-b switchab"><a href="#" id="classDoneButton"  data-rel="back" data-role="button" data-theme="b">Done</a></div>
 			</div>
