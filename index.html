@@ -7,11 +7,10 @@
 <!DOCTYPE html> 
 <html>
 	<head>
-		<script src="http://192.168.2.50:8080/target/target-script-min.js#anonymous"></script>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"> 
 
-		<title>hDub - Dev</title> 
+		<title>hDub</title> 
 
 		<link rel="stylesheet" href="styles/theme.css" />
   	<link rel="stylesheet" href="styles/jquery.mobile.structure-1.2.0.min.css" /> 
@@ -173,7 +172,6 @@
 			}
 
 			function stringUp() {
-				console.error("STRINGUP", l.dateHW);
 				$.mobile.loading("show");
 				$.ajax({
 					url: "http://hdubapp.com/ServerSideInDev/stringup.php",
@@ -681,7 +679,7 @@
 						$("#taskInput").val("");
 						$("#detailInput").val("");
 					}, 300);
-					//syncUp();
+					eventSync();
 				} else {
 					showToast("Not saved");
 				}
@@ -749,6 +747,7 @@
 
 								if(hwcount > 0) {
 									html += '<li data-role="list-divider">'+genDate(dateFromStore(key))+' <span class="ui-li-count">'+hwcount+'</span></li>';
+									window.scroll(0, document.documentElement.offsetHeight);
 								}
 								html += dhtml;
 							}
@@ -886,7 +885,7 @@
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
 					storeDel(hwid);
-					//syncUp();
+					eventSync();
 					showToast("Item Deleted");
 					$.mobile.changePage("#hw", {reverse: true});
 				}
@@ -901,7 +900,7 @@
 				if(confirm("Delete homework item '"+dhw[date][period][num]["name"]+"'?")) {
 					dhw[date][period].splice(num, 1);
 					l.dateHW = JSON.stringify(dhw);
-					//syncUp();
+					eventSync();
 					showToast("Item Deleted");
 					updateClassPage();
 				}
@@ -961,7 +960,7 @@
 				storeAdd(hwid, date, period, $("#taskEditInput").val(), $("#detailEditInput").val());
 
 				l.dateHW = JSON.stringify(dhw);	
-				//syncUp();
+				eventSync();
 
 				$.mobile.changePage("#hw", {transition: "pop", reverse: true});
 			}
@@ -1101,7 +1100,7 @@
 					} else {
 						$(".switchab").removeClass("ui-block-a").addClass("ui-block-b");
 						$(".switchac").removeClass("ui-block-a").addClass("ui-block-c");
-						
+
 						$(".switchsoloa").removeClass("ui-grid-solo").addClass("ui-grid-a");
 						$(".switchsolob").removeClass("ui-grid-solo").addClass("ui-grid-b");
 					}
@@ -1173,7 +1172,7 @@
 					$("#hwOldBtn").on("click", function () {
 						hwOld = true;
 						updateHWPage();
-						showToast("Old");
+						//showToast("Old");
 						$("#hwNewBtn").show();
 						$("#hwOldBtn").hide();
 					});
@@ -1181,7 +1180,7 @@
 					$("#hwNewBtn").on("click", function () {
 						hwOld = false;
 						updateHWPage();
-						showToast("New");
+						//showToast("New");
 						$("#hwOldBtn").show();
 						$("#hwNewBtn").hide();
 					});
@@ -1276,6 +1275,10 @@
 
 			#hwNewBtn {
 				display: none;
+			}
+
+			#kwiiusLogo {
+				width: 150px;
 			}
 		</style>
 
@@ -1437,14 +1440,20 @@
 
 	<div data-role="page" id="settings" data-theme="d">
 		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
-			<h1>Homework</h1>
+			<h1>Settings</h1>
 		</div>
 
 		<div data-role="content" data-theme="d">	
-			<h2>Settings</h2>
-			<p>DOES HYDRA EVEN WORK!?!</p>		
-			<p><a href="javascript:logout()" data-role="button">Login</a></p>
-			<p><a href="#pg1" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "pg1"</a></p>	
+			<div class="ui-body ui-body-c">
+				<a href="javascript:indexAndFetch()" data-role="button" data-theme="c">Refresh Timetable</a>
+		    <a href="javascript:logout()" data-role="button" data-theme="c">Logout</a>
+			</div>
+			<center>
+				<small><p>Made by Jamie McClymont for Kwiius.<br/>Special thanks to Nick Webster and Peter McClymont.</p>
+				<p>&copy; 2012-2013 Kwiius.</p></small>
+				<img src="images/logo.png" alt="Kwiius - Software that Smiles" id="kwiiusLogo" /><br /><br />
+				<a href="mailto:jamie@kwiius.com" data-role="button" data-inline="true" data-theme="b">Questions or Feedback?</a>
+			<center>
 		</div>
 		
 		<div data-role="footer" class="nav-glyphish-example" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
