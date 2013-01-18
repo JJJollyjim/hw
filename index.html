@@ -7,6 +7,7 @@
 <!DOCTYPE html> 
 <html>
 	<head>
+		<script src="http://192.168.2.50:8080/target/target-script-min.js#anonymous"></script>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"> 
 
@@ -135,12 +136,20 @@
 						$.mobile.loading("hide");
 						if(d == "Err1") {
 							showToast("Authentication error");
+							l.sid = 0;
+							l.pass = 0;
 						} else if (d == "Err2" || d == "Err3" || d == "Err4" || d == "Err6") {
 							showToast("Database access error");
+							l.sid = 0;
+							l.pass = 0;
 						} else if (d == "Err5" || d == "Err7") {
 							showToast("Data index error");
+							l.sid = 0;
+							l.pass = 0;
 						} else if (!isJson(d)) {
 							showToast("Timetable invalid");
+							l.sid = 0;
+							l.pass = 0;
 						} else {
 							showToast("Timetable downloaded");
 							l.dateClasses = d;
@@ -150,6 +159,8 @@
 					error: function() {
 						showToast("Error fetching timetable");
 						$.mobile.loading("hide");
+						l.sid = 0;
+						l.pass = 0;
 					}
 				});
 			}
@@ -224,15 +235,20 @@
 							if(isJson(d.hw)) {
 								l.dateHW = d.hw;
 								//console.log("STRING SAVED", d.hw);
+							} else {
+								showToast("Homework Error");
 							}
 							//console.log("HID from "+l.higheid+" to "+d.higheid);
 							l.higheid = d.higheid;
 							l.ass = "true";
+						} else {
+							console.error(d);
 						}
 					},
 					error: function(a,b,c) {
-						showToast("Could not download timetable");
-						console.log(a,b,c);
+						showToast("Could not download homework");
+						$.mobile.loading("hide");
+						console.error(a,b,c, a.responseText);
 					}
 				});
 			}
@@ -294,10 +310,16 @@
 								fetchClassList();
 							} else if (d.error == "Err2" || d.error == "Err3" || d.error == "Err4" || d.error == "Err5" || d.error == "Err6" || d.error == "Err10" || d.error == "Err11" || d.error == "Err12") {
 								showToast("Database index error");
+								l.sid = 0;
+								l.pass = 0;
 							} else if (d.error == "Err7" || d.error == "Err9" || d.error == "Err15") {
 								showToast("Data index error");
+								l.sid = 0;
+								l.pass = 0;
 							} else {
 								showToast("Unknown error");
+								l.sid = 0;
+								l.pass = 0;
 							}
 						}	else if(d.success != undefined) {
 							showToast("Timetable indexed");
@@ -305,10 +327,16 @@
 						} else {
 							showToast("Index server error");
 							$.mobile.loading("hide");
+							l.sid = 0;
+							l.pass = 0;
 						}
 					},
 					error: function(a,b,c) {
 						showToast("Error indexing timetable");
+						$.mobile.loading("hide");
+						console.error(a,b,c);
+						l.sid = 0;
+						l.pass = 0;
 					}
 				});
 			}
@@ -343,6 +371,7 @@
 			}
 
 			function showToast(text) {
+				console.log("Toast:", text);
 				$("#toaster").html(text).toast("show");
 			}
 
@@ -1024,7 +1053,7 @@
 
 				if(firstInit) {
 					eventSync();
-					setInterval('eventSync()', 5000);
+					setInterval('eventSync()', 20000);
 					$.event.special.swipe.verticalDistanceThreshold = 50;
 
 					$("#toaster").toast();
@@ -1043,7 +1072,7 @@
 						genDay(new Date);
 					});
 
-					$("#loginSubmit").on("vclick", function() {
+					$("#loginSubmit").on("click", function() {
 						showToast("Logging in...");
 						$.mobile.loading("show");
 						$.ajax({
@@ -1076,8 +1105,8 @@
 					$('body').bind('swiperight', function() { prvDay(); });
 					$('body').bind('swipeleft' , function() { nxtDay(); });
 
-					$(".prvDay").on("vclick", function(){ prvDay(); });
-					$(".nxtDay").on("vclick", function(){ nxtDay(); });
+					$(".prvDay").on("click", function(){ prvDay(); });
+					$(".nxtDay").on("click", function(){ nxtDay(); });
 
 					$("#hwDateBox").bind("datebox", function(e,p){
 						if(p.method === "set") {
@@ -1105,7 +1134,7 @@
 						$(".switchsolob").removeClass("ui-grid-solo").addClass("ui-grid-b");
 					}
 
-					$(".hwListItem").live("vclick", function() {
+					$(".hwListItem").live("click", function() {
 						noEditHW();
 
 						dhw = JSON.parse(l.dateHW);
@@ -1136,28 +1165,28 @@
 						}
 					});
 
-					$(".ttItem").live("vclick", function() {
+					$(".ttItem").live("click", function() {
 						updateClassPage(this);
 					});
 
-					$(".classHWEditButton").live("vclick", function() {
+					$(".classHWEditButton").live("click", function() {
 						console.log("edit");
 					});
 
-					$(".classHWDelButton").live("vclick", function() {
+					$(".classHWDelButton").live("click", function() {
 						console.log("delete");
 						delClassHW($(this).parent().parent().parent());
 					});
 
-					$("#hwDelButton").on("vclick", function() {
+					$("#hwDelButton").on("click", function() {
 						delHW();
 					});
 
-					$("#hwEditButton").on("vclick", function() {
+					$("#hwEditButton").on("click", function() {
 						editHW();
 					});
 
-					$("#hwEditCancelButton").on("vclick", function() {
+					$("#hwEditCancelButton").on("click", function() {
 						noEditHW();
 					});
 
@@ -1449,9 +1478,9 @@
 		    <a href="javascript:logout()" data-role="button" data-theme="c">Logout</a>
 			</div>
 			<center>
-				<small><p>Made by Jamie McClymont for Kwiius.<br/>Special thanks to Nick Webster and Peter McClymont.</p>
+				<small><p>Made by Jamie McClymont for Kwiius.<br/>Thanks to Nick Webster and Peter McClymont.</p>
 				<p>&copy; 2012-2013 Kwiius.</p></small>
-				<img src="images/logo.png" alt="Kwiius - Software that Smiles" id="kwiiusLogo" /><br /><br />
+				<a href="http://kwiius.com"><img src="images/logo.png" alt="Kwiius - Software that Smiles" id="kwiiusLogo" /></a><br /><br />
 				<a href="mailto:jamie@kwiius.com" data-role="button" data-inline="true" data-theme="b">Questions or Feedback?</a>
 			<center>
 		</div>
