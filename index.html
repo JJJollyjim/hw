@@ -378,12 +378,8 @@
 			}
 
 			function showToast(text) {
-				//console.log("Toast:", text);
+				console.log("Toast:", text);
 				$("#toaster").html(text).toast("show");
-			}
-
-			function CCOutput() {
-
 			}
 
 			function genDate(d) {
@@ -723,7 +719,6 @@
 
 			function sc(i) {
 				showToast(i);
-				//console.warn("SC:", i);
 			}
 
 			function updateHWPage() {
@@ -857,7 +852,7 @@
 			function updateTTPage() {
 				d = new Date;
 				d.setTime(d.getTime()+86400000*day);
-
+				
 				t = new Date();
 				resetHrs(d);
 				resetHrs(t);
@@ -868,20 +863,27 @@
 				var html = "";
 				todayClasses = JSON.parse(l.dateClasses)[storeDate];
 				todayHW = JSON.parse(l.dateHW)[storeDate];
-
+				
 				if(todayClasses != undefined) {
+					
 					$(template).each(function(){
+						
 						if(this.type == "class") {
 							n = new Date();
 							now = n.getHours()*60+n.getMinutes();
-							isNow = (now>=pdTimes[n.getDay()][this.period][0] && now < pdTimes[n.getDay()][this.period][1]);
-
+							console.warn(now, pdTimes, n.getDay(), this.period)
+							if(pdTimes[n.getDay()] != undefined) {
+								isNow = (now>=pdTimes[n.getDay()][this.period][0] && now < pdTimes[n.getDay()][this.period][1]);
+							} else {
+								isNow = false;
+							}
+							
 							if(isToday && isNow) {
 								html += '<div class="ui-body ui-body-b nowSubject ttItem" data-date="'+storeDate+'" data-period="'+this.period+'">';
 							} else {
 								html += '<div class="ui-body ui-body-c ttItem" data-date="'+storeDate+'" data-period="'+this.period+'">';
 							}
-
+							
 							html += '<h3 class="subjectTitle">'+todayClasses[this.period].name+'</h3>';
 
 							if(isToday && isNow) {
