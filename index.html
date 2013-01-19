@@ -874,7 +874,7 @@
 						if(this.type == "class") {
 							n = new Date();
 							now = n.getHours()*60+n.getMinutes();
-							isNow = (now>=pdTimes[1][this.period][0] && now < pdTimes[1][this.period][1]);
+							isNow = (now>=pdTimes[n.getDay()][this.period][0] && now < pdTimes[n.getDay()][this.period][1]);
 
 							if(isToday && isNow) {
 								html += '<div class="ui-body ui-body-b nowSubject ttItem" data-date="'+storeDate+'" data-period="'+this.period+'">';
