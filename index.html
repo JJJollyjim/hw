@@ -96,7 +96,13 @@
 			var months = {0: "Jan", 1: "Feb", 2: "Mar", 3: "Apr", 4: "May", 5: "Jun", 6: "Jul", 7: "Aug", 8: "Sep", 9: "Oct", 10: "Nov", 11: "Dec"};
 			var fullMonths = {0: "Janurary", 1: "Feburary", 2: "March", 3: "April", 4: "May", 5: "June", 6: "July", 7: "August", 8: "September", 9: "October", 10: "November", 11: "December"};
 			var template = [{"type":"class", "period":"1"}, {"type":"class", "period":"2"}, {"type":"break", "name":"Formtime/assembly/interval"}, {"type":"class", "period":"3"}, {"type":"class", "period":"4"}, {"type":"break", "name":"Lunchtime"}, {"type":"class", "period":"5"}, {"type":"class", "period":"6"}];
-			var pdTimes = {1: {1: [525,575], 2: [575,625], 3: [660,710], 4: [710,760], 5: [820,870], 6: [870,920]}}
+			var pdTimes = {
+				1: {1: [525,575], 2: [575,625], 3: [660,710], 4: [710,760], 5: [820,870], 6: [870,920]},
+				2: {1: [525,570], 2: [570,615], 3: [635,685], 4: [685,735], 5: [785,830], 6: [830,875]},
+				3: {1: [525,575], 2: [575,625], 3: [660,710], 4: [710,760], 5: [820,870], 6: [870,920]},
+				4: {1: [525,575], 2: [575,625], 3: [670,720], 4: [720,770], 5: [820,870], 6: [870,920]},
+				5: {1: [525,575], 2: [575,625], 3: [670,720], 4: [720,770], 5: [820,870], 6: [870,920]}
+			}
 
 			objSize = function(obj) {
 		    var siz = 0, key;
@@ -232,6 +238,7 @@
 								showToast("Unknown error");
 							}
 						} else if(d.hw != undefined) {
+							d.hw = d.hw.replace(/\\'/g, "'");
 							if(isJson(d.hw)) {
 								l.dateHW = d.hw;
 								//console.log("STRING SAVED", d.hw);
@@ -242,13 +249,13 @@
 							l.higheid = d.higheid;
 							l.ass = "true";
 						} else {
-							console.error(d);
+							//console.error(d);
 						}
 					},
 					error: function(a,b,c) {
 						showToast("Could not download homework");
 						$.mobile.loading("hide");
-						console.error(a,b,c, a.responseText);
+						//console.error(a,b,c, a.responseText);
 					}
 				});
 			}
@@ -284,7 +291,7 @@
 								if(d.newEventsNum > 0 || d.yourEventsNum > 0) {
 									if(d.newEventsNum > 0) {
 										applyEvents(d.newEvents);
-										console.log("APPLYING NEW EVENTS: "+d.newEventsNum, d.newEvents);
+										//console.log("APPLYING NEW EVENTS: "+d.newEventsNum, d.newEvents);
 									}
 									stringUp();
 								}
@@ -334,7 +341,7 @@
 					error: function(a,b,c) {
 						showToast("Error indexing timetable");
 						$.mobile.loading("hide");
-						console.error(a,b,c);
+						//console.error(a,b,c);
 						l.sid = 0;
 						l.pass = 0;
 					}
@@ -371,7 +378,7 @@
 			}
 
 			function showToast(text) {
-				console.log("Toast:", text);
+				//console.log("Toast:", text);
 				$("#toaster").html(text).toast("show");
 			}
 
@@ -611,13 +618,13 @@
 				$("#classDataStore").data("date", date);
 				$("#classDataStore").data("period", period);
 
-				$("#className").text(info["name"]+":");
-				$("#classDate").html("<b>Date:</b> "+jsDate.getDate()+"<sup>"+supertexts[jsDate.getDate()]+"</sup> "+fullMonths[jsDate.getMonth()]);
-				$("#classPeriod").html("<b>Period:</b> "+period);
+				$("#className").text(info["name"]);
+				$("#classDate").text("Period "+period+", "+genDate(jsDate));
+				//$("#classPeriod").html("<b>Period:</b> "+period);
 				if(dhw[date] != undefined) {
 					if(dhw[date][period] != undefined) {
 						if(dhw[date][period].length > 0) {
-							html = "<h4>Homework:</h4>";
+							html = "";
 							
 							num = 0;
 							$(dhw[date][period]).each(function() {
@@ -641,13 +648,13 @@
 							$("#classHW").html(html);
 							$(".classHWButton").button();
 						} else {
-							$("#classHW").html("<b>Homework:</b> No homework");
+							$("#classHW").html("No homework due");
 						}
 					} else {
-						$("#classHW").html("<b>Homework:</b> No homework");
+						$("#classHW").html("No homework due");
 					}
 				} else {
-					$("#classHW").html("<b>Homework:</b> No homework");
+					$("#classHW").html("No homework due");
 				}
 
 				setPD = period;
@@ -716,7 +723,7 @@
 
 			function sc(i) {
 				showToast(i);
-				console.warn("SC:", i);
+				//console.warn("SC:", i);
 			}
 
 			function updateHWPage() {
@@ -743,16 +750,18 @@
 							if(dd >= td) {
 								dhtml = "";
 								hwcount = 0;
-								for (key2 in dhw[key]) {
-									for (key3 in dhw[key][key2]) {
-										dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+' data-hwid='+dhw[key][key2][key3]["hwid"]+'><a href="#hwdetail" class="hwListItemLink">';
-										dhtml += '<h3>'+dhw[key][key2][key3]["name"]+'</h3>';
-										dhtml += '<p>'+dcl[key][key2]["name"]+' (Period '+key2+')</p>';
-										dhtml += '</a></li>';
-										hwcount++;
-										allhwcount++;
+								for (var key2 = 1; key2 <= 6; key2++) {
+									if(dhw[key][key2] != undefined) {
+										for (key3 in dhw[key][key2]) {
+											dhtml += '<li class="hwListItem" data-date='+key+' data-period='+key2+' data-num='+key3+' data-hwid='+dhw[key][key2][key3]["hwid"]+'><a href="#hwdetail" class="hwListItemLink">';
+											dhtml += '<h3>'+dhw[key][key2][key3]["name"]+'</h3>';
+											dhtml += '<p>'+dcl[key][key2]["name"]+' (Period '+key2+')</p>';
+											dhtml += '</a></li>';
+											hwcount++;
+											allhwcount++;
+										}
 									}
-								}
+								};
 
 								if(hwcount > 0) {
 									html += '<li data-role="list-divider">'+genDate(dateFromStore(key))+' <span class="ui-li-count">'+hwcount+'</span></li>';
@@ -1088,7 +1097,9 @@
 									l.sid = $("#loginSid").val();
 									l.pass = $("#loginPass").val();
 									l.dateHW = "{}";
-									indexAndFetch();
+									//indexAndFetch();
+									fetchClassList();
+									//TODO FIX THIS SOON
 									dlString();
 								} else {
 									showToast("Login failed");
@@ -1155,7 +1166,7 @@
 
 						$("#hwDName").text(info["name"]+":");
 						$("#hwDSubject").html("<b>Subject:</b> "+dcl[date][period]["name"]);
-						$("#hwDDue").html("<b>Due Date:</b> "+jsDate.getDate()+"<sup>"+supertexts[jsDate.getDate()]+"</sup> "+fullMonths[jsDate.getMonth()]);
+						$("#hwDDue").html("<b>Due:</b> Period "+period+", "+genDate(jsDate));
 						$("#hwDDesc").html(info["details"]);
 
 						if(info["details"] != "" && info["details"] != " ") {
@@ -1170,11 +1181,11 @@
 					});
 
 					$(".classHWEditButton").live("click", function() {
-						console.log("edit");
+						//console.log("edit");
 					});
 
 					$(".classHWDelButton").live("click", function() {
-						console.log("delete");
+						//console.log("delete");
 						delClassHW($(this).parent().parent().parent());
 					});
 
@@ -1290,6 +1301,14 @@
 		    -webkit-animation-duration: 250ms !important;
 			}
 
+			/* .out .aFooter {
+				display: none;
+			} */
+
+			/* .out .aHeader {
+				display: none;
+			} */
+
 			.ttItem {
 				margin-bottom: 10px;
 			}
@@ -1309,6 +1328,18 @@
 			#kwiiusLogo {
 				width: 150px;
 			}
+
+			* {
+				-webkit-user-select:none;
+				-moz-user-select:none;
+				user-select:none;
+			}
+
+			p, input, textarea {
+				-webkit-user-select:text;
+				-moz-user-select:text;
+				user-select:text;
+			}
 		</style>
 
 	</head>
@@ -1324,7 +1355,7 @@
 	YP   YP  `8b8' `8d8'    88      YP   YP  Y888P  Y88888P    VP 
 	                                                              -->
 	<div data-role="page" id="pg1" data-theme="d">
-		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked" class="aHeader">
 			<a href="#goto" data-icon="grid" class="gotoGotoBtn" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
 			<a href="#addhw" data-icon="plus" class="ui-btn-right">HW</a>
@@ -1340,7 +1371,7 @@
 			<p>Error loading content. If this is a common error, please email <a href="mailto:jamie@kwiius.com">jamie@kwiius.com</a></p>
 		</div><br /><br /><br />
 		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
+		<div data-role="footer" class="nav-glyphish-example" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linkedf" class="aFooter">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
 				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist email">Timetable</a></li>
@@ -1361,7 +1392,7 @@
  																																			-->
 		                                        
 	<div data-role="page" id="pg2" data-theme="d">
-		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked" class="aHeader">
 			<a href="#goto" data-icon="grid" class="gotoGotoBtn" data-rel="dialog" data-transition="pop">Go to</a>
 			<h1 class="dayTitle">Today</h1>
 			<a href="#addhw" data-icon="plus" class="ui-btn-right">HW</a>
@@ -1377,7 +1408,7 @@
 			<p>Error loading content. If this is error occours often, please email <a href="mailto:jamie@kwiius.com">jamie@kwiius.com</a></p>
 		</div><br /><br /><br />
 		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
+		<div data-role="footer" class="nav-glyphish-example" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linkedf" class="aFooter">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
 				<li><a href="#" data-icon="custom" data-transition="none" class="ui-btn-active ui-state-persist email">Timetable</a></li>
@@ -1428,7 +1459,7 @@
 													 																		-->
 	<div data-role="page" id="hw" data-theme="d">
 
-		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked" class="aHeader">
 			<a href="#" class="ui-btn-left" id="hwOldBtn">Old</a>
 			<a href="#" class="ui-btn-left" id="hwNewBtn">New</a>
 			<h1>Homework</h1>
@@ -1447,7 +1478,7 @@
 			</ul>
 		</div>
 		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
+		<div data-role="footer" class="nav-glyphish-example" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linkedf" class="aFooter">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
 				<li><a href="#pg1" class="email" data-icon="custom" data-transition="none">Timetable</a></li>
@@ -1468,7 +1499,7 @@
 																																				-->
 
 	<div data-role="page" id="settings" data-theme="d">
-		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked">
+		<div data-role="header" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linked" class="aHeader">
 			<h1>Settings</h1>
 		</div>
 
@@ -1485,7 +1516,7 @@
 			<center>
 		</div>
 		
-		<div data-role="footer" class="nav-glyphish-example" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linkedf">
+		<div data-role="footer" class="nav-glyphish-example" data-theme="a" data-position="fixed" data-tap-toggle="false" data-id="linkedf" class="aFooter">
 			<div data-role="navbar" class="nav-glyphish-example" data-grid="b">
 			<ul>
 				<li><a href="#pg1" class="email" data-icon="custom" data-transition="none">Timetable</a></li>
@@ -1585,7 +1616,7 @@
 																																									-->
 	<div data-role="dialog" id="hwdetail">
 		<div data-role="header" data-theme="a">
-			<h1 id="hwDataStore">Homework Detail</h1>
+			<h1 id="hwDataStore">HW Detail</h1>
 		</div>
 		<div data-role="content">
 			<div id="hwDisplaySection">
@@ -1661,7 +1692,6 @@
 		<div data-role="content">
 			<h2 id="className">Error</h2>
 			<p id="classDate">Error</p>
-			<p id="classPeriod">Error</p>
 			<p id="classHW">Error</p>
 			<div class="ui-grid-a switchsoloa">
 				<div class="ui-block-a switchaa"><a href="#addhw" id="classEditButton" data-icon="plus" data-role="button" data-theme="c">HW</a></div>
