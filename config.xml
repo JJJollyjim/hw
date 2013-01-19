@@ -48,4 +48,7 @@
 	<gap:splash src="splashes/SplashMDPI.png" gap:platform="android" gap:density="mdpi" />
 	<gap:splash src="splashes/SplashHDPI.png" gap:platform="android" gap:density="hdpi" />
 	<gap:splash src="splashes/SplashXHDPI.png" gap:platform="android" gap:density="xhdpi" />
+
+	<preference name="permissions" value="none"/>
+	<feature name="http://api.phonegap.com/1.0/network"/>
 </widget>
