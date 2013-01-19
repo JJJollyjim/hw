@@ -7,6 +7,7 @@
 <!DOCTYPE html> 
 <html>
 	<head>
+		<!--<script src="http://192.168.2.50:8080/target/target-script-min.js#anonymous"></script>-->
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"> 
 
@@ -726,6 +727,7 @@
 			}
 
 			function updateHWPage() {
+				$("body").scrollTop(0);
 				dhw = JSON.parse(l.dateHW);
 				dhw = sortOBJ(dhw);
 				dcl = JSON.parse(l.dateClasses);
@@ -784,7 +786,8 @@
 
 								if(hwcount > 0) {
 									html += '<li data-role="list-divider">'+genDate(dateFromStore(key))+' <span class="ui-li-count">'+hwcount+'</span></li>';
-									window.scroll(0, document.documentElement.offsetHeight);
+									$("body").scrollTop($("body")[0].scrollHeight);
+									setTimeout('$("body").scrollTop($("body")[0].scrollHeight);', 500);
 								}
 								html += dhtml;
 							}
@@ -820,8 +823,6 @@
 								}
 							}
 						}
-
-
 					}
 
 					for(key4 in tempConstruct) {
@@ -1510,7 +1511,7 @@
 			<center>
 				<small><p>Made by Jamie McClymont for Kwiius.<br/>Thanks to Nick Webster and Peter McClymont.</p>
 				<p>&copy; 2012-2013 Kwiius.</p></small>
-				<a href="http://kwiius.com"><img src="images/logo.png" alt="Kwiius - Software that Smiles" id="kwiiusLogo" /></a><br /><br />
+				<a href="http://kwiius.com" target="_blank"><img src="images/logo.png" alt="Kwiius - Software that Smiles" id="kwiiusLogo" /></a><br /><br />
 				<a href="mailto:jamie@kwiius.com" data-role="button" data-inline="true" data-theme="b">Questions or Feedback?</a>
 			<center>
 		</div>
