@@ -27,7 +27,6 @@
 	<preference name="exit-on-suspend" value="false" />
 	<preference name="show-splash-screen-spinner" value="true" />
 	<preference name="auto-hide-splash-screen" value="true" />
-	<preference name="load-url-timeout" value="30" />
 
 	<icon src="icons/IconiPhone.png" gap:platform="ios" width="57" height="57" />
 	<icon src="icons/IconiPad.png" gap:platform="ios" width="72" height="72" />
