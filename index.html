@@ -160,6 +160,7 @@
 							showToast("Timetable downloaded");
 							l.dateClasses = d;
 							$.mobile.changePage("#pg1");
+							dlString();
 						}
 					},
 					error: function() {
@@ -1101,7 +1102,6 @@
 									l.dateHW = "{}";
 									indexAndFetch();
 									//fetchClassList();
-									dlString();
 								} else {
 									showToast("Login failed");
 									$.mobile.loading("hide");
