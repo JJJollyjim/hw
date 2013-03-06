@@ -88,6 +88,10 @@
 			if(l.unsyncedEvents == undefined) {
 				l.unsyncedEvents = "{}";
 			}
+
+			if(l.version == undefined) {
+				l.version = "1.0.5";
+			}
 			
 			//l.dateClasses = '{}';
 
@@ -379,7 +383,7 @@
 			}
 
 			function showToast(text) {
-				console.log("Toast:", text);
+				//console.log("Toast:", text);
 				$("#toaster").html(text).toast("show");
 			}
 
@@ -704,7 +708,7 @@
 
 					dhw[storeDate][classnum].push({name: $("#taskInput").val(), details: $("#detailInput").val(), hwid: hwid});
 					storeAdd(hwid, storeDate, classnum, $("#taskInput").val(), $("#detailInput").val());
-
+					
 					l.dateHW = JSON.stringify(dhw);
 					showToast("Saved");
 					$.mobile.changePage("#hw", {transition: "pop", reverse: true});
@@ -872,7 +876,6 @@
 						if(this.type == "class") {
 							n = new Date();
 							now = n.getHours()*60+n.getMinutes();
-							console.warn(now, pdTimes, n.getDay(), this.period)
 							if(pdTimes[n.getDay()] != undefined) {
 								isNow = (now>=pdTimes[n.getDay()][this.period][0] && now < pdTimes[n.getDay()][this.period][1]);
 							} else {
@@ -1168,7 +1171,7 @@
 						$("#hwDName").text(info["name"]+":");
 						$("#hwDSubject").html("<b>Subject:</b> "+dcl[date][period]["name"]);
 						$("#hwDDue").html("<b>Due:</b> Period "+period+", "+genDate(jsDate));
-						$("#hwDDesc").html(info["details"]);
+						$("#hwDDesc").html(info["details"].replace(/\n/g, "<br />"));
 
 						if(info["details"] != "" && info["details"] != " ") {
 							$("#hwDDesc").show();
