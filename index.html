@@ -308,6 +308,7 @@
 			}
 
 			function indexAndFetch() {
+				$.mobile.loading("show");
 				$.ajax({
 					url: "http://hdubapp.com/ServerSideInDev/indexer.php",
 					type: "GET",
