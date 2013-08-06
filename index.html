@@ -504,7 +504,7 @@
 
 			function dateFromStore(s) {
 				spl = s.split("-");
-				return new Date(spl[0], parseInt(spl[1])-1, spl[2]);
+				return new Date(spl[0], parseInt(spl[1], 10)-1, spl[2]);
 			}
 
 			function storeAdd(hwid, date, period, name, details) {
